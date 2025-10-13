@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS markers (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    olc TEXT,
+    address TEXT,
+    detail TEXT,
+    lat DOUBLE PRECISION NOT NULL,
+    lon DOUBLE PRECISION NOT NULL
+);

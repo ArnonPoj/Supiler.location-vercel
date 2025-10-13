@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>แผนที่ปักหมุดแบบ Folium + Leaflet</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+  <style>
+    html, body { height: 100%; margin: 0; font-family: 'Roboto', sans-serif; }
+    #mapid { height: 100%; }
+
+    #exportBtn {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      padding: 10px 15px; background-color: #4CAF50;
+      color: white; border: none; border-radius: 8px;
+      cursor: pointer; font-family: 'Roboto', sans-serif;
+    }
+    #exportBtn:hover { background-color: #45a049; }
+
+    #importBtn {
+      position: fixed; top: 20px; right: 140px; z-index: 9999;
+      padding: 10px 15px; background-color: #2196F3;
+      color: white; border: none; border-radius: 8px;
+      cursor: pointer; font-family: 'Roboto', sans-serif;
+    }
+    #importBtn:hover { background-color: #1976D2; }
+
+    #floatBtn {
+      position: fixed; bottom: 20px; right: 20px;
+      width: 48px; height: 48px; border-radius: 24px;
+      font-size: 28px; background: #007bff;
+      color: white; border: none; cursor: pointer;
+      z-index: 999; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    #popupForm {
+      display: none; position: fixed; bottom: 80px; right: 20px;
+      background: white; padding: 15px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 8px; width: 280px; z-index: 1000;
+    }
+
+    #popupForm input, #popupForm textarea, #popupForm button {
+      width: 100%; margin-bottom: 8px; padding: 8px;
+      font-size: 14px; font-family: 'Roboto', sans-serif;
+      box-sizing: border-box;
+    }
+
+    #popupForm textarea { resize: vertical; }
+    #popupForm button#cancelPopupBtn { background: #ccc; }
+
+    #searchBox {
+      position: fixed; top: 20px; left: 20px; z-index: 9999;
+      width: 300px; padding: 8px 12px; font-size: 14px;
+      border-radius: 8px; border: 1px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .leaflet-tooltip.marker-label {
+      background: rgba(255,255,255,0.9); color: #333;
+      border-radius: 4px; padding: 2px 6px; font-size: 13px;
+      font-weight: bold; border: 1px solid #ccc;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .leaflet-popup-content {
+      font-family: 'Roboto', sans-serif;
+    }
+
+    #toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background-color: rgba(51,51,51,0.95); color: #fff;
+      padding: 10px 18px; border-radius: 8px;
+      display: none; z-index: 99999; font-size: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+<button id="importBtn" onclick="document.getElementById('importInput').click()">📥 Import CSV</button>
+<input type="file" id="importInput" accept=".csv" style="display:none;" />
+
+<!-- ปุ่มวงกลมสีแดง -->
+<button id="tempMarkerBtn">🔴</button>
+
+<!-- ฟอร์มปักหมุดชั่วคราว -->
+<div id="tempMarkerForm">
+  <input type="text" id="tempOLC" placeholder="OLC (เช่น 7P52VV6Q+J4)" />
+  <button onclick="showTemporaryMarker(document.getElementById('tempOLC').value)">ปักหมุดชั่วคราว</button>
+</div>
+
+<style>
+#tempMarkerBtn {
+  position: fixed; bottom: 80px; right: 20px;
+  width: 48px; height: 48px; border-radius: 24px;
+  font-size: 28px; background: #ff4d4f; /* สีแดง */
+  color: white; border: none; cursor: pointer;
+  z-index: 9999; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+#tempMarkerForm {
+  display: none;
+  position: fixed; bottom: 140px; right: 20px;
+  background: white; padding: 15px; border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); width: 250px;
+  z-index: 10000;
+}
+
+#tempMarkerForm input {
+  width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box;
+}
+#tempMarkerForm button {
+  width: 100%; padding: 8px; background: #ff4d4f; color: white; border: none; border-radius: 4px; cursor: pointer;
+}
+</style>
+
+<script>
+document.getElementById('tempMarkerBtn').onclick = function() {
+  const form = document.getElementById('tempMarkerForm');
+  form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+};
+</script>
+
+<style>
+.olc-chip {
+  background-color: #e0e0e0; /* สีเทา */
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px 0;
+  transition: all 0.2s ease;
+}
+
+.olc-chip:hover {
+  background-color: #d0d0d0;
+}
+.olc-chip:active {
+  transform: scale(0.95);
+}
+</style>
+
+<button id="exportBtn" onclick="window.location.href='/export'">📤 Export CSV</button>
+<input type="text" id="searchBox" placeholder="ค้นหาชื่อหรือ tag ประเภทสินค้า..." />
+<div id="mapid"></div>
+<button id="floatBtn">+</button>
+
+<div id="popupForm">
+  <b id="formTitle">เพิ่มหมุดใหม่</b><br>
+  <input type="text" id="popupName" placeholder="ชื่อสถานที่" /><br>
+  <input type="text" id="popupOLC" placeholder="OLC (เช่น 7P52VV6Q+J4)" /><br>
+  <textarea id="popupAddress" placeholder="ที่อยู่ (ถ้ามี)" rows="2"></textarea><br>
+  <textarea id="popupDetail" placeholder="รายละเอียดเพิ่มเติม (ถ้ามี)" rows="3"></textarea><br>
+  <input type="text" id="popupTag" placeholder="tag ประเภทสินค้า (คั่นด้วย , )" /><br>
+  <button id="savePopupBtn">บันทึก</button>
+  <button id="cancelPopupBtn">ยกเลิก</button>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, duration);
+  }
+
+  var map = L.map('mapid').setView([13.7563, 100.5018], 12);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap &copy; CARTO',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  var markers = [];
+  var allMarkersData = [];
+  var editingMarkerId = null;
+  var tempMarker = null;
+
+  async function loadMarkers() {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    const res = await fetch('/markers');
+    allMarkersData = await res.json();
+    applyFilterAndShowMarkers();
+  }
+
+  function applyFilterAndShowMarkers() {
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    const searchText = document.getElementById('searchBox').value.trim().toLowerCase();
+    const filtered = allMarkersData.filter(m => {
+      const title = (m.title || '').toLowerCase();
+      const tag = (m.tag || '').toLowerCase();
+      return title.includes(searchText) || tag.includes(searchText);
+    });
+
+    filtered.forEach(m => {
+      const popupContent = `
+        <div>
+          <b>${m.title}</b><br>
+              
+          <!-- กล่อง OLC สีเทา -->
+          <button class="olc-chip" data-olc="${m.olc}" title="กดเพื่อคัดลอก OLC">
+          ${m.olc || '-'}
+          </button><br>
+
+          <b>ที่อยู่:</b> ${m.address || '-'}<br>
+          <b>รายละเอียด:</b> ${m.detail || '-'}<br>
+          <b>tag:</b> ${m.tag || '-'}<br><br>
+          <button onclick="editMarker(${m.id})" style="margin-right:8px;">แก้ไข</button>
+          <button onclick="deleteMarker(${m.id})" style="color: red;">ลบหมุดนี้</button>
+        </div>
+      `;
+      const marker = L.marker([m.lat, m.lon])
+        .addTo(map)
+        .bindTooltip(m.title || '', {
+          permanent: true,
+          direction: 'top',
+          offset: [0, -10],
+          className: 'marker-label'
+        })
+        .bindPopup(popupContent);
+      markers.push(marker);
+    });
+  }
+
+  // เมื่อคลิก OLC ให้คัดลอกไปยังคลิปบอร์ด
+document.addEventListener("click", function(event) {
+  if (event.target.classList.contains("olc-chip")) {
+    const olc = event.target.getAttribute("data-olc");
+    if (olc && olc !== '-') {
+      navigator.clipboard.writeText(olc)
+        .then(() => showToast(`✅ คัดลอก OLC: ${olc}`))
+        .catch(() => showToast("❌ คัดลอก OLC ไม่สำเร็จ"));
+    }
+  }
+});
+
+  document.getElementById('searchBox').addEventListener('input', applyFilterAndShowMarkers);
+
+  function showPopupForm() {
+    document.getElementById('popupForm').style.display = 'block';
+  }
+
+  function hidePopupForm() {
+    document.getElementById('popupForm').style.display = 'none';
+    editingMarkerId = null;
+    resetForm();
+  }
+
+  function resetForm() {
+    document.getElementById('formTitle').textContent = 'เพิ่มหมุดใหม่';
+    document.getElementById('popupName').value = '';
+    document.getElementById('popupOLC').value = '';
+    document.getElementById('popupAddress').value = '';
+    document.getElementById('popupDetail').value = '';
+    document.getElementById('popupTag').value = '';
+    document.getElementById('savePopupBtn').textContent = 'บันทึก';
+  }
+
+  async function showTemporaryMarker(olc) {
+    if (!olc) {
+      showToast('กรุณากรอก OLC');
+      return;
+    }
+
+    try {
+      const res = await fetch("/decode_olc_temp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ olc })
+      });
+
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "ถอดรหัส OLC ไม่สำเร็จ");
+
+      const { lat, lng } = data;
+
+      if (tempMarker) map.removeLayer(tempMarker);
+
+      tempMarker = L.marker([lat, lng], {
+        icon: L.icon({
+          iconUrl: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle.png",
+          iconSize: [12, 12],
+          iconAnchor: [6, 6]
+        })
+      }).addTo(map).bindPopup(`<b>หมุดชั่วคราว</b><br>OLC: ${olc}`).openPopup();
+
+      map.setView([lat, lng], 18);
+
+    } catch (err) {
+      console.error(err);
+      showToast("เกิดข้อผิดพลาดในการปักหมุดชั่วคราว");
+    }
+  }
+
+function hidePopupForm() {
+  document.getElementById('popupForm').style.display = 'none';
+  editingMarkerId = null;
+  resetForm();
+
+  // ลบหมุดชั่วคราวถ้ามี
+  if (tempMarker) {
+    map.removeLayer(tempMarker);
+    tempMarker = null;
+  }
+}
+
+  document.getElementById("floatBtn").onclick = function() {
+    if (document.getElementById('popupForm').style.display === 'block') {
+      hidePopupForm();
+    } else {
+      resetForm();
+      showPopupForm();
+    }
+  };
+
+  document.getElementById('cancelPopupBtn').onclick = hidePopupForm;
+
+  document.getElementById('savePopupBtn').onclick = async function() {
+    const title = document.getElementById('popupName').value.trim();
+    const olc = document.getElementById('popupOLC').value.trim();
+    const address = document.getElementById('popupAddress').value.trim();
+    const detail = document.getElementById('popupDetail').value.trim();
+    const tag = document.getElementById('popupTag').value.trim();
+
+    if (!title) return showToast('กรุณากรอกชื่อสถานที่');
+    if (!olc) return showToast('กรุณากรอก OLC (Plus Code)');
+
+    const payload = { title, olc, address, detail, tag };
+    let url = '/add_marker', method = 'POST';
+
+    if (editingMarkerId !== null) {
+      url = `/edit_marker/${editingMarkerId}`;
+      method = 'PUT';
+    }
+
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await res.json();
+    if (res.ok) {
+      showToast(editingMarkerId === null ? 'เพิ่มหมุดสำเร็จ' : 'แก้ไขหมุดสำเร็จ');
+      hidePopupForm();
+      loadMarkers();
+    } else {
+      showToast('ผิดพลาด: ' + result.error);
+    }
+  };
+
+  async function deleteMarker(id) {
+    if (!confirm('ต้องการลบหมุดนี้หรือไม่?')) return;
+
+    const res = await fetch(`/delete_marker/${id}`, { method: 'DELETE' });
+    const result = await res.json();
+
+    if (res.ok) {
+      showToast('ลบหมุดสำเร็จ');
+      loadMarkers();
+    } else {
+      showToast('ลบไม่สำเร็จ: ' + (result.error || ''));
+    }
+  }
+
+  async function editMarker(id) {
+    const res = await fetch(`/marker/${id}`);
+    if (!res.ok) return showToast('ไม่พบข้อมูลหมุด');
+
+    const data = await res.json();
+    editingMarkerId = id;
+
+    document.getElementById('formTitle').textContent = 'แก้ไขหมุด';
+    document.getElementById('popupName').value = data.title || '';
+    document.getElementById('popupOLC').value = data.olc || '';
+    document.getElementById('popupAddress').value = data.address || '';
+    document.getElementById('popupDetail').value = data.detail || '';
+    document.getElementById('popupTag').value = data.tag || '';
+    document.getElementById('savePopupBtn').textContent = 'บันทึกการแก้ไข';
+    showPopupForm();
+  }
+
+  document.getElementById('importInput').addEventListener('change', async function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch('/import', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        showToast('นำเข้าหมุดเรียบร้อยแล้ว');
+        loadMarkers();
+      } else {
+        showToast('นำเข้าไม่สำเร็จ: ' + (result.error || ''));
+      }
+    } catch (err) {
+      showToast('เกิดข้อผิดพลาดขณะนำเข้าไฟล์');
+    }
+  });
+
+  loadMarkers();
+</script>
+
+</body>
+</html>
