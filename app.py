@@ -162,7 +162,7 @@ province_refs = {
     "Songkhla": (7.2000, 100.5954),
     "Khon Kaen": (16.4322, 102.8236),
     "Chonburi": (13.3611, 100.9847),
-    "Chon buri": (13.3611, 100.9847),
+    "Chon Buri": (13.3611, 100.9847),
     "Nakhon Ratchasima": (14.9799, 102.0977),
     "Phitsanulok": (16.8211, 100.2659),
     "Narathiwat": (6.4264, 101.8231),
