@@ -167,7 +167,7 @@ ul {
       </label>
       <label>
         <input type="radio" name="transportType" value="person">
-        🛻 รถกระบะ (บุคคล)
+        🚙 รถกระบะ (บุคคล)
       </label>
     </div>
 
@@ -291,21 +291,24 @@ document.getElementById('tempMarkerBtn').onclick = function() {
   <div class="section">
     <h4>พื้นที่ที่ไปได้</h4>
 
-    <div class="area-row">
-      <select id="province">
-        <option value="">จังหวัด</option>
-      </select>
-      <select id="district">
-        <option value="">อำเภอ</option>
-      </select>
-      <select id="subdistrict">
-        <option value="">ตำบล (ถ้ามี)</option>
-      </select>
-    </div>
+     <div class="search-select">
+    <input type="text" id="provinceInput" placeholder="พิมพ์จังหวัด">
+    <div id="provinceList" class="dropdown"></div>
+  </div>
 
-    <small class="hint">
-      หากไม่เลือกตำบล ระบบจะถือว่าไปได้ทั้งอำเภอ
-    </small>
+  <div class="search-select">
+    <input type="text" id="districtInput" placeholder="พิมพ์อำเภอ">
+    <div id="districtList" class="dropdown"></div>
+  </div>
+
+  <div class="search-select">
+    <input type="text" id="subdistrictInput" placeholder="พิมพ์ตำบล (ถ้ามี)">
+    <div id="subdistrictList" class="dropdown"></div>
+  </div>
+
+  <small class="hint">
+    หากไม่เลือกตำบล ระบบจะถือว่าไปได้ทั้งอำเภอ
+  </small>
 
     <button type="button" onclick="addArea()">➕ เพิ่มพื้นที่</button>
 
