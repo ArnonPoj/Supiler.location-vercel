@@ -79,6 +79,56 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
   </style>
+
+  <style>
+.popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 10000;
+}
+.popup-card {
+  background: #fff;
+  width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  margin: 5vh auto;
+  padding: 16px;
+  border-radius: 10px;
+}
+.transport-type label {
+  display: block;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.section {
+  margin-bottom: 14px;
+}
+.section h4 {
+  margin: 8px 0;
+}
+input, select {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 6px;
+}
+.popup-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.cancel {
+  background: #ccc;
+}
+.hint {
+  color: #666;
+  font-size: 12px;
+}
+ul {
+  padding-left: 18px;
+}
+</style>
 </head>
 <body>
 
