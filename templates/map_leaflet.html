@@ -148,14 +148,8 @@ ul {
 </style>
 </head>
   
-<body>
-<button
-  style="position:fixed; bottom:80px; left:20px; z-index:9999;"
-  onclick="openTransportPopup()"
->
-  🚚 เพิ่มผู้ขนส่ง
-</button>
-  
+<body>  
+  <button id="transportBtn" onclick="openTransportPopup()">🚚</button>
 <!-- Transport Popup -->
 <div id="transportPopup" class="popup">
   <div class="popup-card">
