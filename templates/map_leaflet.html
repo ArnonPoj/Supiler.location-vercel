@@ -11,6 +11,7 @@
   <style>
     html, body { height: 100%; margin: 0; font-family: 'Roboto', sans-serif; }
     #mapid { height: 100%; }
+    
 
     #exportBtn {
       position: fixed; top: 20px; right: 20px; z-index: 9999;
@@ -78,6 +79,22 @@
       display: none; z-index: 99999; font-size: 14px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
+
+    #transportBtn {
+  position: fixed;
+  bottom: 140px;      /* สูงกว่า + */
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 22px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  cursor: pointer;
+  z-index: 10001;     /* ต้องสูงกว่า map */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
   </style>
 
   <style>
@@ -130,8 +147,15 @@ ul {
 }
 </style>
 </head>
+  
 <body>
-
+<button
+  style="position:fixed; bottom:80px; left:20px; z-index:9999;"
+  onclick="openTransportPopup()"
+>
+  🚚 เพิ่มผู้ขนส่ง
+</button>
+  
 <!-- Transport Popup -->
 <div id="transportPopup" class="popup">
   <div class="popup-card">
@@ -249,7 +273,52 @@ document.getElementById('tempMarkerBtn').onclick = function() {
 </div>
 
 <div id="toast"></div>
+  
+<script type="text/template" id="personFormTemplate">
+  <div class="section">
+    <h4>ข้อมูลรถและคนขับ</h4>
+    <input type="text" id="p_name" placeholder="ชื่อคนขับ *">
+    <input type="text" id="p_plate" placeholder="ทะเบียนรถ">
+    <select id="p_truck_type">
+      <option value="">ประเภทรถ</option>
+      <option>กระบะธรรมดา</option>
+      <option>กระบะคอก</option>
+      <option>กระบะตู้</option>
+    </select>
+    <input type="number" id="p_capacity" placeholder="รับน้ำหนักได้ (ตัน)">
+  </div>
 
+  <div class="section">
+    <h4>ช่องทางติดต่อ</h4>
+    <input type="text" id="p_phone" placeholder="เบอร์โทรติดต่อ *">
+    <input type="text" id="p_line" placeholder="Line ID / Link">
+  </div>
+
+  <div class="section">
+    <h4>พื้นที่ที่ไปได้</h4>
+
+    <div class="area-row">
+      <select id="province">
+        <option value="">จังหวัด</option>
+      </select>
+      <select id="district">
+        <option value="">อำเภอ</option>
+      </select>
+      <select id="subdistrict">
+        <option value="">ตำบล (ถ้ามี)</option>
+      </select>
+    </div>
+
+    <small class="hint">
+      หากไม่เลือกตำบล ระบบจะถือว่าไปได้ทั้งอำเภอ
+    </small>
+
+    <button type="button" onclick="addArea()">➕ เพิ่มพื้นที่</button>
+
+    <ul id="areaList"></ul>
+  </div>
+</script>
+  
 <script>
   function showToast(message, duration = 3000) {
     const toast = document.getElementById('toast');
@@ -505,6 +574,45 @@ function hidePopupForm() {
 
   loadMarkers();
 </script>
+
+  <script>
+/* =========================
+   TRANSPORT UX LOGIC
+========================= */
+
+const popup = document.getElementById("transportPopup");
+const formArea = document.getElementById("transportFormArea");
+
+function openTransportPopup() {
+  popup.style.display = "block";
+}
+
+function closeTransportPopup() {
+  popup.style.display = "none";
+  formArea.innerHTML = '<p class="hint">กรุณาเลือกประเภทขนส่ง</p>';
+}
+
+document
+  .querySelectorAll('input[name="transportType"]')
+  .forEach(r => {
+    r.addEventListener("change", e => {
+      if (e.target.value === "person") {
+        formArea.innerHTML =
+          document.getElementById("personFormTemplate").innerHTML;
+      } else {
+        formArea.innerHTML =
+          '<p class="hint">กำลังพัฒนา</p>';
+      }
+    });
+  });
+
+let areas = [];
+
+function addArea() { ... }
+function saveTransport() { ... }
+
+</script>
+
 
 </body>
 </html>
