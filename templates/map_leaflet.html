@@ -598,6 +598,24 @@ function hidePopupForm() {
 </script>
 
   <script>
+
+/* ===== DATA: พื้นที่ ===== */
+  const provinceData = {
+    "กรุงเทพมหานคร": {
+      "บางนา": ["บางนาเหนือ", "บางนาใต้"],
+      "ดินแดง": []
+    },
+    "กาฬสินธุ์": {
+      "เมืองกาฬสินธุ์": []
+    },
+    "เชียงใหม่": {
+      "แม่ริม": ["ริมใต้", "ริมเหนือ"]
+    }
+  };
+
+  /* ===== map + popup code เดิม ===== */
+
+    
 /* =========================
    TRANSPORT UX LOGIC
 ========================= */
@@ -614,19 +632,99 @@ function closeTransportPopup() {
   formArea.innerHTML = '<p class="hint">กรุณาเลือกประเภทขนส่ง</p>';
 }
 
+function bindSearch(inputId, listId, items, onSelect) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+
+  input.oninput = () => {
+    const q = input.value.trim();
+    list.innerHTML = "";
+    if (!q) return;
+
+    items
+      .filter(i => i.includes(q))
+      .forEach(i => {
+        const div = document.createElement("div");
+        div.textContent = i;
+        div.onclick = () => {
+          input.value = i;
+          list.innerHTML = "";
+          onSelect(i);
+        };
+        list.appendChild(div);
+      });
+  };
+}
+
+function initAreaSearch() {
+  let selectedProvince = null;
+  let selectedDistrict = null;
+
+  bindSearch(
+    "provinceInput",
+    "provinceList",
+    Object.keys(provinceData),
+    province => {
+      selectedProvince = province;
+      document.getElementById("districtInput").value = "";
+      document.getElementById("subdistrictInput").value = "";
+
+      bindSearch(
+        "districtInput",
+        "districtList",
+        Object.keys(provinceData[province]),
+        district => {
+          selectedDistrict = district;
+          document.getElementById("subdistrictInput").value = "";
+
+          const subs = provinceData[province][district] || [];
+          bindSearch(
+            "subdistrictInput",
+            "subdistrictList",
+            subs,
+            () => {}
+          );
+        }
+      );
+    }
+  );
+}
+
 document
   .querySelectorAll('input[name="transportType"]')
   .forEach(r => {
     r.addEventListener("change", e => {
       if (e.target.value === "person") {
-        formArea.innerHTML =
-          document.getElementById("personFormTemplate").innerHTML;
+  formArea.innerHTML =
+    document.getElementById("personFormTemplate").innerHTML;
+  setTimeout(initAreaSearch, 0);
       } else {
         formArea.innerHTML =
           '<p class="hint">กำลังพัฒนา</p>';
       }
     });
   });
+
+function addArea() {
+  const p = document.getElementById("provinceInput").value;
+  const d = document.getElementById("districtInput").value;
+  const s = document.getElementById("subdistrictInput").value || null;
+
+  if (!p) return alert("กรุณาเลือกจังหวัด");
+
+  areas.push({ province: p, district: d || null, subdistrict: s });
+
+  const li = document.createElement("li");
+  li.textContent =
+    p +
+    (d ? " / " + d : " (ทั้งจังหวัด)") +
+    (s ? " / " + s : "");
+
+  document.getElementById("areaList").appendChild(li);
+
+  document.getElementById("districtInput").value = "";
+  document.getElementById("subdistrictInput").value = "";
+}
 
 let areas = [];
 
