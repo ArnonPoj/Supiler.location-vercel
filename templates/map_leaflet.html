@@ -82,6 +82,41 @@
 </head>
 <body>
 
+<!-- Transport Popup -->
+<div id="transportPopup" class="popup">
+  <div class="popup-card">
+    <h3>เพิ่มผู้ให้บริการขนส่ง</h3>
+
+    <!-- ประเภทขนส่ง -->
+    <div class="transport-type">
+      <label>
+        <input type="radio" name="transportType" value="trailer">
+        🚛 บริษัทพ่วงต่างจังหวัด
+      </label>
+      <label>
+        <input type="radio" name="transportType" value="contract">
+        🚚 บริษัทเหมาคันรถ
+      </label>
+      <label>
+        <input type="radio" name="transportType" value="person">
+        🛻 รถกระบะ (บุคคล)
+      </label>
+    </div>
+
+    <hr>
+
+    <!-- Dynamic Form -->
+    <div id="transportFormArea">
+      <p class="hint">กรุณาเลือกประเภทขนส่ง</p>
+    </div>
+
+    <div class="popup-actions">
+      <button onclick="saveTransport()">บันทึก</button>
+      <button class="cancel" onclick="closeTransportPopup()">ยกเลิก</button>
+    </div>
+  </div>
+</div>
+
 <button id="importBtn" onclick="document.getElementById('importInput').click()">📥 Import CSV</button>
 <input type="file" id="importInput" accept=".csv" style="display:none;" />
 
