@@ -738,10 +738,10 @@ async function saveTransport() {
 
   const payload = {
     transport_type: "person",
-    name: document.getElementById("p_name")?.value.trim(),
-    plate: document.getElementById("p_plate")?.value.trim(),
-    truck_type: document.getElementById("p_truck_type")?.value,
-    capacity: document.getElementById("p_capacity")?.value,
+    owner_name: document.getElementById("p_name")?.value.trim(),
+    license_plate: document.getElementById("p_plate")?.value.trim(),
+    vehicle_type: document.getElementById("p_truck_type")?.value,
+    capacity_ton: document.getElementById("p_capacity")?.value,
     phone: document.getElementById("p_phone")?.value.trim(),
     line: document.getElementById("p_line")?.value.trim(),
     areas: areas
