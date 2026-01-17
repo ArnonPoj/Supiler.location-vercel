@@ -652,22 +652,24 @@ function initAreaSearch() {
     Object.keys(AREA_MAP),
     province => {
       selectedProvince = province;
+
       document.getElementById("districtInput").value = "";
       document.getElementById("subdistrictInput").value = "";
 
+      // ✅ ใช้ AREA_MAP ตรง ๆ (เป็น array)
       bindSearch(
         "districtInput",
         "districtList",
-        Object.keys(provinceData[province]),
+        AREA_MAP[province],
         district => {
           selectedDistrict = district;
           document.getElementById("subdistrictInput").value = "";
 
-          const subs = provinceData[province][district] || [];
+          // ตอนนี้คุณยังไม่มีตำบล → ส่ง array ว่างไปก่อน
           bindSearch(
             "subdistrictInput",
             "subdistrictList",
-            subs,
+            [],
             () => {}
           );
         }
@@ -676,6 +678,7 @@ function initAreaSearch() {
   );
 }
 
+    
 document
   .querySelectorAll('input[name="transportType"]')
   .forEach(r => {
