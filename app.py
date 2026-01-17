@@ -475,14 +475,53 @@ def get_pickup_personal_api():
 
 @app.route('/save_transport_personal', methods=['POST'])
 def save_transport_personal():
-    data = request.get_json()
+    data = request.get_json() or {}
 
-    # data['areas'] = list ของพื้นที่
-    # ตรงนี้จะ INSERT:
-    # 1. ตาราง personal_transport (ข้อมูลหลัก)
-    # 2. ตาราง personal_transport_area (พื้นที่วิ่ง)
+    owner_name = data.get("owner_name")
+    phone = data.get("phone")
+    line = data.get("line")
+    vehicle_type = data.get("vehicle_type")
+    capacity_ton = data.get("capacity_ton")
+    license_plate = data.get("license_plate")
+    areas = data.get("areas", [])
 
-    return jsonify({"ok": True})
+    if not owner_name or not phone:
+        return jsonify({"error": "ข้อมูลไม่ครบ"}), 400
+
+    conn = get_conn()
+    cur = conn.cursor()
+
+    # 1️⃣ insert หลัก
+    cur.execute("""
+        INSERT INTO personal_transport
+        (owner_name, phone, line, vehicle_type, capacity_ton, license_plate)
+        VALUES (%s,%s,%s,%s,%s,%s)
+        RETURNING id
+    """, (
+        owner_name, phone, line,
+        vehicle_type, capacity_ton, license_plate
+    ))
+
+    transport_id = cur.fetchone()[0]
+
+    # 2️⃣ insert areas
+    for a in areas:
+        cur.execute("""
+            INSERT INTO personal_transport_area
+            (transport_id, province, district, subdistrict)
+            VALUES (%s,%s,%s,%s)
+        """, (
+            transport_id,
+            a.get("province"),
+            a.get("district"),
+            a.get("subdistrict")
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"ok": True, "id": transport_id})
+
 
 @app.route("/api/transport/personal", methods=["POST"])
 def save_personal_transport():
