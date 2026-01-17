@@ -20,8 +20,6 @@ async function loadAreaData() {
     if (!provinceName) return;
     AREA_MAP[provinceName].push(d.districtNameTh);
   });
-
-  initProvinceSearch();
 }
 
 loadAreaData();
