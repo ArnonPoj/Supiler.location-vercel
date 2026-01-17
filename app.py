@@ -473,6 +473,18 @@ def get_pickup_personal_api():
         for r in rows
     ])
 
+@app.route('/save_transport_personal', methods=['POST'])
+def save_transport_personal():
+    data = request.get_json()
+
+    # data['areas'] = list ของพื้นที่
+    # ตรงนี้จะ INSERT:
+    # 1. ตาราง personal_transport (ข้อมูลหลัก)
+    # 2. ตาราง personal_transport_area (พื้นที่วิ่ง)
+
+    return jsonify({"ok": True})
+
+
 @app.route('/import', methods=['POST'])
 def import_markers():
     if 'file' not in request.files:
