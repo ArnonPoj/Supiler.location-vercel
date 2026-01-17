@@ -736,6 +736,21 @@ async function saveTransport() {
     return;
   }
 
+   const payload = {
+    transport_type: "person",
+    owner_name: document.getElementById("p_name")?.value.trim(),
+    license_plate: document.getElementById("p_plate")?.value.trim(),
+    vehicle_type: document.getElementById("p_truck_type")?.value,
+    capacity_ton: document.getElementById("p_capacity")?.value,
+    phone: document.getElementById("p_phone")?.value.trim(),
+    line: document.getElementById("p_line")?.value.trim(),
+    areas: areas
+  };
+
+  if (!payload.owner_name || !payload.phone) {
+    alert("กรุณากรอกชื่อคนขับ และเบอร์โทร");
+    return;
+  }
  
   if (areas.length === 0) {
     alert("กรุณาเพิ่มพื้นที่อย่างน้อย 1 พื้นที่");
