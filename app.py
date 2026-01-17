@@ -417,42 +417,6 @@ def export_markers():
         headers={"Content-Disposition": "attachment;filename=markers_export.csv"}
     )
 
-@app.route('/import', methods=['POST'])
-def import_markers():
-    if 'file' not in request.files:
-        return jsonify({'error': 'ไม่พบไฟล์'}), 400
-    
-    file = request.files['file']
-    filename = secure_filename(file.filename)
-
-    if not filename.endswith('.csv'):
-        return jsonify({'error': 'รองรับเฉพาะไฟล์ CSV เท่านั้น'}), 400
-
-    try:
-        # ใช้ pandas อ่านไฟล์ CSV
-        df = pd.read_csv(file)
-
-        # ตรวจสอบว่ามีคอลัมน์ครบ
-        expected_cols = {'id', 'lat', 'lon', 'title', 'olc', 'address', 'detail', 'tag'}
-        if not expected_cols.issubset(df.columns):
-            return jsonify({'error': 'รูปแบบไฟล์ไม่ถูกต้อง'}), 400
-
-        conn = get_conn()
-        cur = conn.cursor()
-
-        # ลบข้อมูลเก่าออกก่อน ถ้าต้องการ merge ให้เปลี่ยน logic ตรงนี้
-        cur.execute("DELETE FROM markers")
-
-        for _, row in df.iterrows():
-            cur.execute("""
-                INSERT INTO markers (lat, lon, title, olc, address, detail, tag)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (
-                float(row['lat']), float(row['lon']), row['title'],
-                row['olc'], row['address'], row['detail'], row['tag']
-            ))
-
-
 def add_pickup_personal(driver_name, phone=None, note=None):
     conn = get_conn()
     c = conn.cursor()
@@ -508,6 +472,42 @@ def get_pickup_personal_api():
         }
         for r in rows
     ])
+
+@app.route('/import', methods=['POST'])
+def import_markers():
+    if 'file' not in request.files:
+        return jsonify({'error': 'ไม่พบไฟล์'}), 400
+    
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+
+    if not filename.endswith('.csv'):
+        return jsonify({'error': 'รองรับเฉพาะไฟล์ CSV เท่านั้น'}), 400
+
+    try:
+        # ใช้ pandas อ่านไฟล์ CSV
+        df = pd.read_csv(file)
+
+        # ตรวจสอบว่ามีคอลัมน์ครบ
+        expected_cols = {'id', 'lat', 'lon', 'title', 'olc', 'address', 'detail', 'tag'}
+        if not expected_cols.issubset(df.columns):
+            return jsonify({'error': 'รูปแบบไฟล์ไม่ถูกต้อง'}), 400
+
+        conn = get_conn()
+        cur = conn.cursor()
+
+        # ลบข้อมูลเก่าออกก่อน ถ้าต้องการ merge ให้เปลี่ยน logic ตรงนี้
+        cur.execute("DELETE FROM markers")
+
+        for _, row in df.iterrows():
+            cur.execute("""
+                INSERT INTO markers (lat, lon, title, olc, address, detail, tag)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                float(row['lat']), float(row['lon']), row['title'],
+                row['olc'], row['address'], row['detail'], row['tag']
+            ))
+
 
 
         conn.commit()
