@@ -484,6 +484,12 @@ def save_transport_personal():
 
     return jsonify({"ok": True})
 
+@app.route("/api/transport/personal", methods=["POST"])
+def save_personal_transport():
+    data = request.json
+    print("RECEIVED:", data)
+    return jsonify({"ok": True})
+
 
 @app.route('/import', methods=['POST'])
 def import_markers():
