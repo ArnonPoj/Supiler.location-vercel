@@ -601,6 +601,62 @@ function hidePopupForm() {
 </script>
 
   <script>
+
+async function saveTransport() {
+  const type = document.querySelector(
+    'input[name="transportType"]:checked'
+  )?.value;
+
+  if (type !== "person") {
+    alert("ตอนนี้รองรับเฉพาะ รถกระบะ (บุคคล)");
+    return;
+  }
+
+  const payload = {
+    transport_type: "person",
+    name: document.getElementById("p_name")?.value.trim(),
+    plate: document.getElementById("p_plate")?.value.trim(),
+    truck_type: document.getElementById("p_truck_type")?.value,
+    capacity: document.getElementById("p_capacity")?.value,
+    phone: document.getElementById("p_phone")?.value.trim(),
+    line: document.getElementById("p_line")?.value.trim(),
+    areas: areas
+  };
+
+  if (!payload.name || !payload.phone) {
+    alert("กรุณากรอกชื่อคนขับ และเบอร์โทร");
+    return;
+  }
+
+  if (areas.length === 0) {
+    alert("กรุณาเพิ่มพื้นที่อย่างน้อย 1 พื้นที่");
+    return;
+  }
+
+  try {
+    const res = await fetch("/save_transport_personal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.error || "บันทึกไม่สำเร็จ");
+      return;
+    }
+
+    alert("บันทึกสำเร็จ");
+    closeTransportPopup();
+    areas = [];
+    document.getElementById("areaList").innerHTML = "";
+
+  } catch (err) {
+    console.error(err);
+    alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+  }
+}
     
 /* =========================
    TRANSPORT UX LOGIC
