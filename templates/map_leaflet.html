@@ -649,7 +649,7 @@ function initAreaSearch() {
   bindSearch(
     "provinceInput",
     "provinceList",
-    Object.keys(provinceData),
+    Object.keys(AREA_MAP),
     province => {
       selectedProvince = province;
       document.getElementById("districtInput").value = "";
