@@ -747,7 +747,7 @@ async function saveTransport() {
     areas: areas
   };
 
-  if (!payload.name || !payload.phone) {
+  if (!payload.owner_name || !payload.phone) {
     alert("กรุณากรอกชื่อคนขับ และเบอร์โทร");
     return;
   }
