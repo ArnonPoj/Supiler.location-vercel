@@ -1,9 +1,8 @@
-CREATE TABLE IF NOT EXISTS markers (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    olc TEXT,
-    address TEXT,
-    detail TEXT,
-    lat DOUBLE PRECISION NOT NULL,
-    lon DOUBLE PRECISION NOT NULL
-);
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS transport_pickup_personal (
+            id SERIAL PRIMARY KEY,
+            driver_name TEXT NOT NULL,
+            phone TEXT,
+            note TEXT
+        )
+    ''')
