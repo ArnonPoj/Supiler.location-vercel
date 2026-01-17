@@ -61,6 +61,7 @@ def add_marker(lat, lon, title, olc_code=None, address=None, detail=None, tag=No
     conn.commit()
     conn.close()
 
+
 def update_marker(id, lat, lon, title, olc_code=None, address=None, detail=None, tag=None):  # เพิ่ม tag
     conn = get_conn()
     c = conn.cursor()
@@ -450,6 +451,64 @@ def import_markers():
                 float(row['lat']), float(row['lon']), row['title'],
                 row['olc'], row['address'], row['detail'], row['tag']
             ))
+
+
+def add_pickup_personal(driver_name, phone=None, note=None):
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO transport_pickup_personal (driver_name, phone, note)
+        VALUES (%s, %s, %s)
+        RETURNING id
+    """, (driver_name, phone, note))
+    new_id = c.fetchone()[0]
+    conn.commit()
+    conn.close()
+    return new_id
+
+def get_all_pickup_personal():
+    conn = get_conn()
+    c = conn.cursor()
+    c.execute("""
+        SELECT id, driver_name, phone, note
+        FROM transport_pickup_personal
+        ORDER BY driver_name
+    """)
+    rows = c.fetchall()
+    conn.close()
+    return rows
+    
+@app.route('/pickup_personal', methods=['POST'])
+def add_pickup_personal_api():
+    data = request.get_json() or {}
+
+    driver_name = data.get('driver_name', '').strip()
+    phone = data.get('phone', '').strip() or None
+    note = data.get('note', '').strip() or None
+
+    if not driver_name:
+        return jsonify({'error': 'กรุณาระบุชื่อคนขับ'}), 400
+
+    new_id = add_pickup_personal(driver_name, phone, note)
+
+    return jsonify({
+        'message': 'เพิ่มรถกระบะส่วนบุคคลสำเร็จ',
+        'id': new_id
+    }), 200
+    
+@app.route('/pickup_personal', methods=['GET'])
+def get_pickup_personal_api():
+    rows = get_all_pickup_personal()
+    return jsonify([
+        {
+            'id': r[0],
+            'driver_name': r[1],
+            'phone': r[2],
+            'note': r[3]
+        }
+        for r in rows
+    ])
+
 
         conn.commit()
         conn.close()
