@@ -644,6 +644,35 @@ function bindSearch(inputId, listId, items, onSelect) {
   };
 }
 
+function loadDrivers(province, district) {
+  fetch(
+    `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(district)}`
+  )
+    .then(r => r.json())
+    .then(drivers => {
+      const box = document.getElementById("driverList");
+      box.innerHTML = "";
+
+      if (drivers.length === 0) {
+        box.innerHTML = "<p>ไม่มีรถวิ่งในอำเภอนี้</p>";
+        return;
+      }
+
+      drivers.forEach(d => {
+        const div = document.createElement("div");
+        div.className = "driver-card";
+        div.innerHTML = `
+          <b>${d.name}</b><br>
+          📞 ${d.phone || "-"}<br>
+          🚚 ${d.vehicle_type || "-"} (${d.capacity || "-"} ตัน)<br>
+          🪪 ${d.plate || "-"}
+        `;
+        box.appendChild(div);
+      });
+    });
+}
+
+
 function initAreaSearch() {
   let selectedProvince = null;
   let selectedDistrict = null;
