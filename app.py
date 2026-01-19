@@ -523,7 +523,7 @@ def save_transport_personal():
     return jsonify({"ok": True, "id": transport_id})
 
 @app.route("/api/transport/personal/by-area")
-def get_personal_by_area():
+def get_personal_transport_by_area():
     province = request.args.get("province")
     district = request.args.get("district")
 
@@ -532,36 +532,31 @@ def get_personal_by_area():
 
     cur.execute("""
         SELECT
-            pt.id,
-            pt.owner_name,
-            pt.phone,
-            pt.line,
-            pt.vehicle_type,
-            pt.capacity_ton,
-            pt.license_plate
-        FROM personal_transport pt
-        JOIN personal_transport_area pa
-          ON pt.id = pa.transport_id
-        WHERE pa.province = %s
-          AND pa.district = %s
-        ORDER BY pt.owner_name
-    """, (province, district))
+            owner_name,
+            phone,
+            vehicle_type,
+            capacity_ton,
+            license_plate
+        FROM transport_personal tp
+        JOIN transport_area ta ON tp.id = ta.transport_id
+        WHERE ta.province = %s
+          AND (%s IS NULL OR ta.district = %s)
+    """, (province, district, district))
 
     rows = cur.fetchall()
     conn.close()
 
-    return jsonify([
-        {
-            "id": r[0],
-            "name": r[1],
-            "phone": r[2],
-            "line": r[3],
-            "vehicle_type": r[4],
-            "capacity": r[5],
-            "plate": r[6]
-        }
-        for r in rows
-    ])
+    drivers = []
+    for r in rows:
+        drivers.append({
+            "name": r[0],
+            "phone": r[1],
+            "vehicle_type": r[2],
+            "capacity": r[3],
+            "plate": r[4],
+        })
+
+    return jsonify(drivers)
 
 
 @app.route('/import', methods=['POST'])
