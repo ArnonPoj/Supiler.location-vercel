@@ -893,7 +893,20 @@ const geojson = L.geoJSON(districtGeoJson, {
   onEachFeature
 }).addTo(map);
 
+function onEachFeature(feature, layer) {
+  layer.bindTooltip(
+    `${feature.properties.AMP_NAME}`,
+    {
+      permanent: false,
+      direction: "center",
+      className: "area-label"
+    }
+  );
 
+  layer.on("click", function () {
+    console.log("CLICK:", feature.properties.AMP_NAME);
+  });
+}
 
 </script>
 
