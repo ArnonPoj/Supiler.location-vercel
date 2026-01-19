@@ -770,6 +770,43 @@ function initAreaSearch() {
   );
 }
 
+function style(feature) {
+  return {
+    color: "#3388ff",
+    weight: 1,
+    fillOpacity: 0.15
+  };
+}
+
+function highlightFeature(e) {
+  const layer = e.target;
+  layer.setStyle({
+    weight: 3,
+    color: "#ff7800",
+    fillOpacity: 0.35
+  });
+}
+
+function resetHighlight(e) {
+  geojson.resetStyle(e.target);
+}
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    mouseover: highlightFeature,
+    mouseout: resetHighlight,
+    click: (e) => {
+      highlightFeature(e);
+    }
+  });
+}
+
+const geojson = L.geoJSON(districtGeoJson, {
+  style,
+  onEachFeature
+}).addTo(map);
+
+
     
 document
   .querySelectorAll('input[name="transportType"]')
