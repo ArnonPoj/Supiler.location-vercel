@@ -772,57 +772,6 @@ function initAreaSearch() {
   );
 }
 
-function style(feature) {
-  return {
-    color: "#3388ff",
-    weight: 1,
-    fillOpacity: 0.15
-  };
-}
-
-document
-  .querySelectorAll('input[name="transportType"]')
-  .forEach(r => {
-    r.addEventListener("change", e => {
-      if (e.target.value === "person") {
-  formArea.innerHTML =
-    document.getElementById("personFormTemplate").innerHTML;
-  setTimeout(initAreaSearch, 0);
-      } else {
-        formArea.innerHTML =
-          '<p class="hint">กำลังพัฒนา</p>';
-      }
-    });
-  });
-
-function highlightFeature(e) {
-  const layer = e.target;
-  layer.setStyle({
-    weight: 3,
-    color: "#ff7800",
-    fillOpacity: 0.35
-  });
-}
-
-function resetHighlight(e) {
-  geojson.resetStyle(e.target);
-}
-
-function onEachFeature(feature, layer) {
-  layer.on({
-    mouseover: highlightFeature,
-    mouseout: resetHighlight,
-    click: (e) => {
-      highlightFeature(e);
-    }
-  });
-}
-
-const geojson = L.geoJSON(districtGeoJson, {
-  style,
-  onEachFeature
-}).addTo(map);
-
 async function startApp() {
   await loadAreaData();   // ✅ รอข้อมูล
 }
@@ -907,6 +856,43 @@ async function saveTransport() {
     alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
   }
 }
+
+function style(feature) {
+  return {
+    color: "#3388ff",
+    weight: 1,
+    fillOpacity: 0.15
+  };
+}
+
+function highlightFeature(e) {
+  const layer = e.target;
+  layer.setStyle({
+    weight: 3,
+    color: "#ff7800",
+    fillOpacity: 0.35
+  });
+}
+
+function resetHighlight(e) {
+  geojson.resetStyle(e.target);
+}
+
+function onEachFeature(feature, layer) {
+  layer.on({
+    mouseover: highlightFeature,
+    mouseout: resetHighlight,
+    click: (e) => {
+      highlightFeature(e);
+    }
+  });
+}
+
+const geojson = L.geoJSON(districtGeoJson, {
+  style,
+  onEachFeature
+}).addTo(map);
+
 
 
 </script>
