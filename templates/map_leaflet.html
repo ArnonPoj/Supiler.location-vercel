@@ -8,51 +8,6 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
 
-  <script>
-  var map = L.map('mapid').setView([13.7563, 100.5018], 12);
-
-  L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      maxZoom: 19
-    }
-  ).addTo(map);
-
-  // ✅ ใส่โค้ด GEOJSON ตรงนี้
-  fetch("/static/thailand_district.geojson")
-    .then(res => res.json())
-    .then(data => {
-
-      L.geoJSON(data, {
-        style: {
-          color: "#555",
-          weight: 1,
-          fillOpacity: 0
-        },
-        onEachFeature: (feature, layer) => {
-
-          // 🖱️ คลิกอำเภอ
-          layer.on("click", () => {
-            const province = feature.properties.PROV_NAME;
-            const district = feature.properties.AMP_NAME;
-
-            loadDrivers(province, district);
-          });
-
-          // 👁️ hover เห็นชื่ออำเภอ
-          layer.bindTooltip(
-            feature.properties.AMP_NAME,
-            { sticky: true }
-          );
-        }
-      }).addTo(map);
-
-    });
-
-  
-</script>
-
 
   <style>
     html, body { height: 100%; margin: 0; font-family: 'Roboto', sans-serif; }
@@ -774,6 +729,7 @@ function initAreaSearch() {
 
 async function startApp() {
   await loadAreaData();   // ✅ รอข้อมูล
+  initAreaSearch();
 }
 
 startApp();
@@ -857,57 +813,40 @@ async function saveTransport() {
   }
 }
 
-function style(feature) {
-  return {
-    color: "#3388ff",
-    weight: 1,
-    fillOpacity: 0.15
-  };
-}
 
-function highlightFeature(e) {
-  const layer = e.target;
-  layer.setStyle({
-    weight: 3,
-    color: "#ff7800",
-    fillOpacity: 0.35
+</script>
+
+<!-- โค้ดแรก -->
+<script>
+fetch("/static/thailand_district.geojson")
+  .then(res => res.json())
+  .then(data => {
+
+    L.geoJSON(data, {
+      style: {
+        color: "#555",
+        weight: 1,
+        fillOpacity: 0   // โปร่งใส แต่คลิกได้
+      },
+      onEachFeature: (feature, layer) => {
+
+        // hover เห็นชื่ออำเภอ
+        layer.bindTooltip(
+          feature.properties.AMP_NAME,
+          { sticky: true }
+        );
+
+        // คลิกอำเภอ
+        layer.on("click", () => {
+          const province = feature.properties.PROV_NAME;
+          const district = feature.properties.AMP_NAME;
+
+          loadDrivers(province, district);
+        });
+      }
+    }).addTo(map);
+
   });
-}
-
-function resetHighlight(e) {
-  geojson.resetStyle(e.target);
-}
-
-function onEachFeature(feature, layer) {
-  layer.on({
-    mouseover: highlightFeature,
-    mouseout: resetHighlight,
-    click: (e) => {
-      highlightFeature(e);
-    }
-  });
-}
-
-const geojson = L.geoJSON(districtGeoJson, {
-  style,
-  onEachFeature
-}).addTo(map);
-
-function onEachFeature(feature, layer) {
-  layer.bindTooltip(
-    `${feature.properties.AMP_NAME}`,
-    {
-      permanent: false,
-      direction: "center",
-      className: "area-label"
-    }
-  );
-
-  layer.on("click", function () {
-    console.log("CLICK:", feature.properties.AMP_NAME);
-  });
-}
-
 </script>
 
 
