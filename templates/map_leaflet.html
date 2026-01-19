@@ -49,6 +49,8 @@
       }).addTo(map);
 
     });
+
+  
 </script>
 
 
@@ -778,6 +780,21 @@ function style(feature) {
   };
 }
 
+document
+  .querySelectorAll('input[name="transportType"]')
+  .forEach(r => {
+    r.addEventListener("change", e => {
+      if (e.target.value === "person") {
+  formArea.innerHTML =
+    document.getElementById("personFormTemplate").innerHTML;
+  setTimeout(initAreaSearch, 0);
+      } else {
+        formArea.innerHTML =
+          '<p class="hint">กำลังพัฒนา</p>';
+      }
+    });
+  });
+
 function highlightFeature(e) {
   const layer = e.target;
   layer.setStyle({
@@ -805,23 +822,6 @@ const geojson = L.geoJSON(districtGeoJson, {
   style,
   onEachFeature
 }).addTo(map);
-
-
-    
-document
-  .querySelectorAll('input[name="transportType"]')
-  .forEach(r => {
-    r.addEventListener("change", e => {
-      if (e.target.value === "person") {
-  formArea.innerHTML =
-    document.getElementById("personFormTemplate").innerHTML;
-  setTimeout(initAreaSearch, 0);
-      } else {
-        formArea.innerHTML =
-          '<p class="hint">กำลังพัฒนา</p>';
-      }
-    });
-  });
 
 async function startApp() {
   await loadAreaData();   // ✅ รอข้อมูล
