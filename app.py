@@ -524,42 +524,51 @@ def save_transport_personal():
 
 @app.route("/api/transport/personal/by-area")
 def get_personal_transport_by_area():
-    province = request.args.get("province")
-    district = request.args.get("district")
+    try:
+        province = request.args.get("province")
+        district = request.args.get("district")
 
-    print("DEBUG province:", province)
-    print("DEBUG district:", district)
+        print("DEBUG province =", province)
+        print("DEBUG district =", district)
 
-    conn = get_conn()
-    cur = conn.cursor()
+        conn = get_conn()
+        cur = conn.cursor()
 
-    cur.execute("""
-        SELECT
-            owner_name,
-            phone,
-            vehicle_type,
-            capacity_ton,
-            license_plate
-        FROM transport_personal tp
-        JOIN transport_area ta ON tp.id = ta.transport_id
-        WHERE ta.province = %s
-          AND (%s IS NULL OR ta.district = %s)
-    """, (province, district, district))
+        cur.execute("""
+            SELECT
+                owner_name,
+                phone,
+                vehicle_type,
+                capacity_ton,
+                license_plate
+            FROM transport_personal tp
+            JOIN transport_area ta ON tp.id = ta.transport_id
+            WHERE ta.province = %s
+              AND (%s IS NULL OR ta.district = %s)
+        """, (province, district, district))
 
-    rows = cur.fetchall()
-    conn.close()
+        rows = cur.fetchall()
+        conn.close()
 
-    drivers = []
-    for r in rows:
-        drivers.append({
-            "name": r[0],
-            "phone": r[1],
-            "vehicle_type": r[2],
-            "capacity": r[3],
-            "plate": r[4],
-        })
+        drivers = []
+        for r in rows:
+            drivers.append({
+                "name": r[0],
+                "phone": r[1],
+                "vehicle_type": r[2],
+                "capacity": r[3],
+                "plate": r[4],
+            })
 
-    return jsonify(drivers)
+        return jsonify(drivers)
+
+    except Exception as e:
+        print("🔥 API ERROR:", e)
+        return jsonify({
+            "error": str(e),
+            "province": province,
+            "district": district
+        }), 500
 
 
 @app.route('/import', methods=['POST'])
