@@ -826,10 +826,9 @@ fetch("/static/thailand_district.geojson")
       style: {
         color: "#555",
         weight: 1,
-        fillOpacity: 0 // โปร่งใส แต่คลิกได้
+        fillOpacity: 0
       },
       onEachFeature: (feature, layer) => {
-        console.log(feature.properties);
 
         // hover เห็นชื่ออำเภอ
         layer.bindTooltip(
@@ -837,24 +836,22 @@ fetch("/static/thailand_district.geojson")
           { sticky: true }
         );
 
-        // คลิกอำเภอ
-        layer.on("click", () => {
-          const province = feature.properties.NL_NAME_1; // จังหวัด
-          const district = feature.properties.NL_NAME_2; // อำเภอ
-          console.log("CLICK:", province, district);
+        // 🔥 double click อำเภอ
+        layer.on("dblclick", (e) => {
+          const province = feature.properties.NL_NAME_1;
+          const district = feature.properties.NL_NAME_2;
+
+          console.log("DOUBLE CLICK:", province, district);
           loadDrivers(province, district);
+
+          // กันไม่ให้ map zoom ตอน dblclick
+          L.DomEvent.stop(e);
         });
       }
     }).addTo(map);
-
-
-    // (optional) zoom ให้พอดีเส้นเขต
-    // map.fitBounds(districtLayer.getBounds());
-
   });
-
-
 </script>
+
 
 
 </body>
