@@ -829,23 +829,24 @@ fetch("/static/thailand_district.geojson")
         fillOpacity: 0 // โปร่งใส แต่คลิกได้
       },
       onEachFeature: (feature, layer) => {
+        console.log(feature.properties);
 
         // hover เห็นชื่ออำเภอ
         layer.bindTooltip(
-          feature.properties.AMP_NAME,
+          feature.properties.NL_NAME_2,
           { sticky: true }
         );
 
         // คลิกอำเภอ
         layer.on("click", () => {
-          const province = feature.properties.PROV_NAME;
-          const district = feature.properties.AMP_NAME;
-
+          const province = feature.properties.NL_NAME_1; // จังหวัด
+          const district = feature.properties.NL_NAME_2; // อำเภอ
           console.log("CLICK:", province, district);
           loadDrivers(province, district);
         });
       }
     }).addTo(map);
+
 
     // (optional) zoom ให้พอดีเส้นเขต
     // map.fitBounds(districtLayer.getBounds());
