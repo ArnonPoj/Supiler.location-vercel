@@ -541,8 +541,8 @@ def get_personal_transport_by_area():
                 vehicle_type,
                 capacity_ton,
                 license_plate
-            FROM transport_personal tp
-            JOIN transport_area ta ON tp.id = ta.transport_id
+            FROM personal_transport tp
+            JOIN personal_transport_area ta ON tp.id = ta.transport_id
             WHERE ta.province = %s
               AND (%s IS NULL OR ta.district = %s)
         """, (province, district, district))
