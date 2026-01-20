@@ -527,6 +527,9 @@ def get_personal_transport_by_area():
     province = request.args.get("province")
     district = request.args.get("district")
 
+    print("DEBUG province:", province)
+    print("DEBUG district:", district)
+
     conn = get_conn()
     cur = conn.cursor()
 
