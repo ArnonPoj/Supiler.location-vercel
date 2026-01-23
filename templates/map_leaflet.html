@@ -929,6 +929,7 @@ function highlightDistrict(districtName) {
   let found = false;
 
   districtLayer.eachLayer(layer => {
+    console.log(layer.feature.properties);
     const props = layer.feature.properties;
 
     // 👇 รองรับหลาย key
