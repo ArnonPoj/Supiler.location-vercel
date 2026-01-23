@@ -663,6 +663,7 @@ function bindSearch(inputId, listId, items, onSelect) {
 }
 
 function loadDrivers(province, district) {
+  console.log("LOAD DRIVERS CALLED:", province, district);
   fetch(
     `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(district)}`
   )
@@ -851,6 +852,34 @@ fetch("/static/thailand_district.geojson")
     }).addTo(map);
   });
 </script>
+
+// pop up คนขับ
+
+<script>
+function showDriverPopup(latlng, district, drivers) {
+  let html = `<h4>🚚 รถในอำเภอ${district}</h4>`;
+
+  if (!drivers || drivers.length === 0) {
+    html += `<p>ไม่มีรถในพื้นที่นี้</p>`;
+  } else {
+    drivers.forEach(d => {
+      html += `
+        <div style="margin-bottom:8px;">
+          <b>${d.name}</b><br>
+          ${d.vehicle_type} (${d.capacity} ตัน)<br>
+          📞 ${d.phone}
+        </div>
+      `;
+    });
+  }
+
+  L.popup({ maxWidth: 300 })
+    .setLatLng(latlng)
+    .setContent(html)
+    .openOn(map);
+}
+</script>
+
 
 
 
