@@ -617,31 +617,32 @@ function hidePopupForm() {
   loadMarkers();
 </script>
 
-  <script>
-    
-/* =========================
-   TRANSPORT UX LOGIC
-========================= */
+<script>
+document.addEventListener("DOMContentLoaded", () => {
 
-const popup = document.getElementById("transportPopup");
-const formArea = document.getElementById("transportFormArea");
+  const popup = document.getElementById("transportPopup");
+  const formArea = document.getElementById("transportFormArea");
 
-document.querySelectorAll('input[name="transportType"]').forEach(radio => {
-  radio.addEventListener("change", e => {
-    if (e.target.value === "person") {
-      formArea.innerHTML =
-        document.getElementById("personFormTemplate").innerHTML;
+  document
+    .querySelectorAll('input[name="transportType"]')
+    .forEach(radio => {
+      radio.addEventListener("change", e => {
+        if (e.target.value === "person") {
+          formArea.innerHTML =
+            document.getElementById("personFormTemplate").innerHTML;
 
-      // 🔥 ต้องเรียกหลัง render ฟอร์ม
-      initAreaSearch();
-    } else {
-      formArea.innerHTML =
-        '<p class="hint">ยังไม่รองรับประเภทนี้</p>';
-    }
-  });
+          initAreaSearch();
+        } else {
+          formArea.innerHTML =
+            '<p class="hint">ยังไม่รองรับประเภทนี้</p>';
+        }
+      });
+    });
+
 });
+</script>
 
-
+<script>
 function openTransportPopup() {
   popup.style.display = "block";
   areas = []; // ✅ reset
