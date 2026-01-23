@@ -617,11 +617,16 @@ function hidePopupForm() {
   loadMarkers();
 </script>
 
+  <script>
+  let popup;
+  let formArea;
+</script>
+  
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
-  const popup = document.getElementById("transportPopup");
-  const formArea = document.getElementById("transportFormArea");
+  popup = document.getElementById("transportPopup");
+  formArea = document.getElementById("transportFormArea");
 
   document
     .querySelectorAll('input[name="transportType"]')
@@ -631,7 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
           formArea.innerHTML =
             document.getElementById("personFormTemplate").innerHTML;
 
-          initAreaSearch();
+          initAreaSearch();   // ⭐ สำคัญ
         } else {
           formArea.innerHTML =
             '<p class="hint">ยังไม่รองรับประเภทนี้</p>';
