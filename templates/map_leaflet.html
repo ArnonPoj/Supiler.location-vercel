@@ -662,32 +662,20 @@ function bindSearch(inputId, listId, items, onSelect) {
   };
 }
 
-function loadDrivers(province, district) {
+function loadDrivers(latlng, province, district) {
   console.log("LOAD DRIVERS CALLED:", province, district);
+
   fetch(
     `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(district)}`
   )
     .then(r => r.json())
     .then(drivers => {
-      const box = document.getElementById("driverList");
-      box.innerHTML = "";
-
-      if (drivers.length === 0) {
-        box.innerHTML = "<p>ไม่มีรถวิ่งในอำเภอนี้</p>";
-        return;
-      }
-
-      drivers.forEach(d => {
-        const div = document.createElement("div");
-        div.className = "driver-card";
-        div.innerHTML = `
-          <b>${d.name}</b><br>
-          📞 ${d.phone || "-"}<br>
-          🚚 ${d.vehicle_type || "-"} (${d.capacity || "-"} ตัน)<br>
-          🪪 ${d.plate || "-"}
-        `;
-        box.appendChild(div);
-      });
+      console.log("DRIVERS =", drivers);
+      showDriverPopup(latlng, district, drivers);
+    })
+    .catch(err => {
+      console.error(err);
+      showDriverPopup(latlng, district, []);
     });
 }
 
@@ -831,26 +819,23 @@ fetch("/static/thailand_district.geojson")
       },
       onEachFeature: (feature, layer) => {
 
+        const province = feature.properties.NL_NAME_1; // จังหวัด
+        const district = feature.properties.NL_NAME_2; // อำเภอ
+
         // hover เห็นชื่ออำเภอ
-        layer.bindTooltip(
-          feature.properties.NL_NAME_2,
-          { sticky: true }
-        );
+        layer.bindTooltip(district, { sticky: true });
 
         // 🔥 double click อำเภอ
-        layer.on("dblclick", (e) => {
-          const province = feature.properties.NL_NAME_1;
-          const district = feature.properties.NL_NAME_2;
-
+        layer.on("dblclick", e => {
           console.log("DOUBLE CLICK:", province, district);
-          loadDrivers(province, district);
-
-          // กันไม่ให้ map zoom ตอน dblclick
-          L.DomEvent.stop(e);
+          loadDrivers(e.latlng, province, district);
         });
       }
     }).addTo(map);
   });
+
+// สำคัญมาก ❗ ปิด zoom จาก double click
+map.doubleClickZoom.disable();
 </script>
 
 // pop up คนขับ
