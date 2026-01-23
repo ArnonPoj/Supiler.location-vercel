@@ -921,23 +921,39 @@ function showDriverPopup(latlng, district, drivers) {
 function highlightDistrict(districtName) {
   if (!districtLayer || !districtName) return;
 
-  const inputName = districtName.trim();
+  const inputName = districtName
+    .replace("อำเภอ", "")
+    .replace("เขต", "")
+    .trim();
+
+  let found = false;
 
   districtLayer.eachLayer(layer => {
-    const geoName = layer.feature.properties.district?.trim();
+    const props = layer.feature.properties;
 
-    // reset ก่อน
+    // 👇 รองรับหลาย key
+    const geoName =
+      props.district ||
+      props.AMP_NAME ||
+      props.AMP_NAME_T ||
+      props.NAME_2 ||
+      props.amphoe ||
+      "";
+
+    // reset ทุกอัน
     layer.setStyle({
       color: "#999",
       weight: 1,
       fillOpacity: 0.05
     });
 
-    if (geoName === inputName) {
+    if (geoName.trim() === inputName) {
+      found = true;
+
       layer.setStyle({
         color: "#ff6600",
         weight: 3,
-        fillOpacity: 0.3
+        fillOpacity: 0.35
       });
 
       map.fitBounds(layer.getBounds(), {
@@ -945,6 +961,10 @@ function highlightDistrict(districtName) {
       });
     }
   });
+
+  if (!found) {
+    console.warn("ไม่พบอำเภอ:", inputName);
+  }
 }
 </script>
 
