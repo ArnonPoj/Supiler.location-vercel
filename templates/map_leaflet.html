@@ -431,6 +431,22 @@ document.getElementById('tempMarkerBtn').onclick = function() {
     });
   }
 
+  // เลเยอร์ไฮไลท์เเมพ หลังจากสร้าง map เสร็จ
+let districtLayer;
+
+fetch("/static/geo/th_districts.geojson")
+  .then(res => res.json())
+  .then(data => {
+    districtLayer = L.geoJSON(data, {
+      style: {
+        color: "#999",
+        weight: 1,
+        fillOpacity: 0.05
+      }
+    }).addTo(map);
+  });
+
+
   // เมื่อคลิก OLC ให้คัดลอกไปยังคลิปบอร์ด
 document.addEventListener("click", function(event) {
   if (event.target.classList.contains("olc-chip")) {
@@ -887,6 +903,19 @@ function showDriverPopup(latlng, district, drivers) {
 }
 </script>
 
+<script>
+  function resetDistrictStyle() {
+  if (!districtLayer) return;
+
+  districtLayer.eachLayer(layer => {
+    layer.setStyle({
+      color: "#999",
+      weight: 1,
+      fillOpacity: 0.05
+    });
+  });
+}
+</script>
 
 
 
