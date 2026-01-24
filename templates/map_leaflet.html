@@ -925,15 +925,12 @@ function highlightDistrict(districtName) {
     .replace("เขต", "")
     .trim();
 
-  let found = false;
-
   districtLayer.eachLayer(layer => {
-    
-    console.log(layer.feature.properties);
-    
+
+    console.log(layer.feature.properties); // ✅ ใส่ตรงนี้
+
     const props = layer.feature.properties;
 
-    // 👇 รองรับหลาย key
     const geoName =
       props.district ||
       props.AMP_NAME ||
@@ -942,7 +939,6 @@ function highlightDistrict(districtName) {
       props.amphoe ||
       "";
 
-    // reset ทุกอัน
     layer.setStyle({
       color: "#999",
       weight: 1,
@@ -950,23 +946,13 @@ function highlightDistrict(districtName) {
     });
 
     if (geoName.trim() === inputName) {
-      found = true;
-
       layer.setStyle({
         color: "#ff6600",
         weight: 3,
         fillOpacity: 0.35
       });
-
-      map.fitBounds(layer.getBounds(), {
-        padding: [40, 40]
-      });
     }
   });
-
-  if (!found) {
-    console.warn("ไม่พบอำเภอ:", inputName);
-  }
 }
 </script>
 
