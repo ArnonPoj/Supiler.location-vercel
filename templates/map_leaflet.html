@@ -849,7 +849,7 @@ fetch("/static/thailand_district.geojson")
   .then(res => res.json())
   .then(data => {
 
-    const districtLayer = L.geoJSON(data, {
+    districtLayer = L.geoJSON(data, {
       style: {
         color: "#555",
         weight: 1,
