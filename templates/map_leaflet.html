@@ -915,59 +915,10 @@ function showDriverPopup(latlng, district, drivers) {
 </script>
 
 <script>
-function normalizeDistrictName(name) {
-  if (!name) return "";
-  return name
-    .replace("อำเภอ", "")
-    .replace("เขต", "")
-    .replace("อ.", "")
-    .trim();
-}
-
-function highlightDistrict(districtName) {
-  if (!districtLayer || !districtName) return;
-
-  const inputName = normalizeDistrictName(districtName);
-
-  districtLayer.eachLayer(layer => {
-    if (!layer.feature || !layer.feature.properties) return;
-
-    const props = layer.feature.properties;
-
-    const geoNameRaw =
-      props.NL_NAME_2 ||   // ไทย
-      props.NAME_2 ||      // อังกฤษ
-      "";
-
-    const geoName = normalizeDistrictName(geoNameRaw);
-
-    // reset ทุกอำเภอ
-    layer.setStyle({
-      color: "#999",
-      weight: 1,
-      fillOpacity: 0.05
-    });
-
-    // ✅ เทียบชื่อที่ถูก normalize แล้ว
-    if (geoName === inputName) {
-      layer.setStyle({
-        color: "#ff6600",
-        weight: 3,
-        fillOpacity: 0.35
-      });
-
-      // ถ้าจะ zoom
-      // map.fitBounds(layer.getBounds(), { padding: [20, 20] });
-    }
-  });
-}
+let highlightedDistricts = new Set();
 </script>
 
-<script>
-let districtLayer = null;
-let areas = [];
-</script>
-
+  
 <script>
 function normalizeDistrictName(name) {
   if (!name) return "";
@@ -978,36 +929,43 @@ function normalizeDistrictName(name) {
     .trim();
 }
 
-function highlightDistrict(districtName) {
-  if (!districtLayer || !districtName) return;
-
-  const inputName = normalizeDistrictName(districtName);
+function highlightDistricts() {
+  if (!districtLayer) return;
 
   districtLayer.eachLayer(layer => {
-    if (!layer.feature || !layer.feature.properties) return;
-
     const geoNameRaw =
-      layer.feature.properties.NL_NAME_2 ||
-      layer.feature.properties.NAME_2 ||
+      layer.feature.properties?.NL_NAME_2 ||
+      layer.feature.properties?.NAME_2 ||
       "";
 
     const geoName = normalizeDistrictName(geoNameRaw);
 
-    layer.setStyle({
-      color: "#999",
-      weight: 1,
-      fillOpacity: 0.05
-    });
-
-    if (geoName === inputName) {
+    if (highlightedDistricts.has(geoName)) {
       layer.setStyle({
         color: "#ff6600",
         weight: 3,
         fillOpacity: 0.35
       });
+    } else {
+      layer.setStyle({
+        color: "#999",
+        weight: 1,
+        fillOpacity: 0.05
+      });
     }
   });
 }
+
+function clearHighlightDistricts() {
+  highlightedDistricts.clear();
+  highlightDistricts();
+}
+
+// expose
+window.highlightDistricts = highlightDistricts;
+window.clearHighlightDistricts = clearHighlightDistricts;
+</script>
+
 
 // ⭐ ทำให้เรียกจากปุ่ม / console ได้
 window.highlightDistrict = highlightDistrict;
