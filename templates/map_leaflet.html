@@ -217,10 +217,6 @@ ul {
   <div id="transportFormArea">
     <p class="hint">กรุณาเลือกประเภทขนส่ง</p>
   </div>
-
-        <div style="text-align:right;margin-top:8px">
-        <button onclick="closeTransportPopup()">ยกเลิก</button>
-      </div>
     </div>
 
 <div id="driverList"
@@ -661,8 +657,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <script>
 function openTransportPopup() {
+  // ถ้า popup เปิดอยู่ → ปิด
+  if (popup.style.display === "block") {
+    closeTransportPopup();
+    return;
+  }
+
+  // ถ้ายังไม่เปิด → เปิด
   popup.style.display = "block";
   areas = [];
+  document.getElementById("areaList").innerHTML = "";
 
   const checked = document.querySelector(
     'input[name="transportType"]:checked'
@@ -672,7 +676,7 @@ function openTransportPopup() {
     formArea.innerHTML =
       document.getElementById("personFormTemplate").innerHTML;
 
-    initAreaSearch(); // ⭐ สำคัญมาก
+    initAreaSearch();
   } else {
     formArea.innerHTML =
       '<p class="hint">กรุณาเลือกประเภทขนส่ง</p>';
