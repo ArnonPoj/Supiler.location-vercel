@@ -920,41 +920,48 @@ function showDriverPopup(latlng, district, drivers) {
 function highlightDistrict(districtName) {
   if (!districtLayer || !districtName) return;
 
+  // ตัดคำหน้า + เก็บชื่อให้สะอาด
   const inputName = districtName
     .replace("อำเภอ", "")
     .replace("เขต", "")
     .trim();
 
   districtLayer.eachLayer(layer => {
-
-    console.log(layer.feature.properties); // ✅ ใส่ตรงนี้
+    if (!layer.feature || !layer.feature.properties) return;
 
     const props = layer.feature.properties;
 
+    // 🔍 debug ดูโครงสร้างจริง
+    console.log(props);
+
+    // ✅ ใช้ key ให้ตรงกับ geojson ไทย
     const geoName =
-      props.district ||
-      props.AMP_NAME ||
-      props.AMP_NAME_T ||
-      props.NAME_2 ||
-      props.amphoe ||
+      props.NL_NAME_2 ||   // อำเภอ (ไทย) ← ตัวหลัก
+      props.NAME_2 ||      // อำเภอ (อังกฤษ)
       "";
 
+    // reset style ทุกอำเภอ
     layer.setStyle({
       color: "#999",
       weight: 1,
       fillOpacity: 0.05
     });
 
+    // ถ้าชื่อตรง → highlight
     if (geoName.trim() === inputName) {
       layer.setStyle({
         color: "#ff6600",
         weight: 3,
         fillOpacity: 0.35
       });
+
+      // (option) zoom เข้าหาอำเภอ
+      // map.fitBounds(layer.getBounds(), { padding: [20, 20] });
     }
   });
 }
 </script>
+
 
 </body>
 </html>
