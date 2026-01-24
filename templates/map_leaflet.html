@@ -951,6 +951,57 @@ function highlightDistrict(districtName) {
 }
 </script>
 
+<script>
+let districtLayer = null;
+let areas = [];
+</script>
+
+<script>
+function normalizeDistrictName(name) {
+  if (!name) return "";
+  return name
+    .replace("อำเภอ", "")
+    .replace("เขต", "")
+    .replace("อ.", "")
+    .trim();
+}
+
+function highlightDistrict(districtName) {
+  if (!districtLayer || !districtName) return;
+
+  const inputName = normalizeDistrictName(districtName);
+
+  districtLayer.eachLayer(layer => {
+    if (!layer.feature || !layer.feature.properties) return;
+
+    const geoNameRaw =
+      layer.feature.properties.NL_NAME_2 ||
+      layer.feature.properties.NAME_2 ||
+      "";
+
+    const geoName = normalizeDistrictName(geoNameRaw);
+
+    layer.setStyle({
+      color: "#999",
+      weight: 1,
+      fillOpacity: 0.05
+    });
+
+    if (geoName === inputName) {
+      layer.setStyle({
+        color: "#ff6600",
+        weight: 3,
+        fillOpacity: 0.35
+      });
+    }
+  });
+}
+
+// ⭐ ทำให้เรียกจากปุ่ม / console ได้
+window.highlightDistrict = highlightDistrict;
+</script>
+
+
 
 </body>
 </html>
