@@ -178,8 +178,35 @@ ul {
   <script src="/static/area_loader.js"></script>
   <button id="transportBtn" onclick="openTransportPopup()">🚚</button>
 <!-- Transport Popup -->
-<div id="transportPopup" class="popup">
-  <div class="popup-card">
+<div id="transportPopupBR">
+  <h3>เพิ่มผู้ให้บริการขนส่ง</h3>
+
+  <div class="transport-type">
+    <label>
+      <input type="radio" name="transportType" value="trailer">
+      🚛 บริษัทพ่วงต่างจังหวัด
+    </label>
+    <label>
+      <input type="radio" name="transportType" value="contract">
+      🚚 บริษัทเหมาคันรถ
+    </label>
+    <label>
+      <input type="radio" name="transportType" value="person">
+      🚙 รถกระบะ (บุคคล)
+    </label>
+  </div>
+
+  <hr>
+
+  <div id="transportFormArea">
+    <p class="hint">กรุณาเลือกประเภทขนส่ง</p>
+  </div>
+
+  <div style="text-align:right;margin-top:8px">
+    <button onclick="closeTransportPopup()">ยกเลิก</button>
+  </div>
+</div>
+
     <h3>เพิ่มผู้ให้บริการขนส่ง</h3>
 
     <!-- ประเภทขนส่ง -->
