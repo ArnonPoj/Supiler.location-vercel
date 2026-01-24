@@ -802,7 +802,12 @@ function addArea() {
 
   if (!p) return alert("กรุณาเลือกจังหวัด");
 
-  areas.push({ province: p, district: d || null, subdistrict: s });
+  areas.push({
+    province: normalizeProvinceName(p),
+    district: d || null,
+    subdistrict: s
+  });
+
 
   const li = document.createElement("li");
   li.textContent =
@@ -896,7 +901,9 @@ fetch("/static/thailand_district.geojson")
       },
       onEachFeature: (feature, layer) => {
 
-        const province = feature.properties.NL_NAME_1; // จังหวัด
+        const province = normalizeProvinceName(
+        feature.properties.NL_NAME_1
+        );   // จังหวัด
         const district = feature.properties.NL_NAME_2; // อำเภอ
 
         // hover เห็นชื่ออำเภอ
@@ -991,6 +998,15 @@ function clearHighlightDistricts() {
 
 // expose
 window.highlightDistricts = highlightDistricts;
+</script>
+
+<script>
+function normalizeProvinceName(name) {
+  if (!name) return "";
+  return name
+    .replace("จังหวัด", "")
+    .trim();
+}
 </script>
 
 
