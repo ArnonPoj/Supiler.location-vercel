@@ -903,24 +903,10 @@ function showDriverPopup(latlng, district, drivers) {
 </script>
 
 <script>
-  function resetDistrictStyle() {
-  if (!districtLayer) return;
-
-  districtLayer.eachLayer(layer => {
-    layer.setStyle({
-      color: "#999",
-      weight: 1,
-      fillOpacity: 0.05
-    });
-  });
-}
-</script>
-
-<script>
 function highlightDistrict(districtName) {
   if (!districtLayer || !districtName) return;
 
-  // ตัดคำหน้า + เก็บชื่อให้สะอาด
+  // 🧹 ทำความสะอาดชื่อจาก input
   const inputName = districtName
     .replace("อำเภอ", "")
     .replace("เขต", "")
@@ -931,14 +917,18 @@ function highlightDistrict(districtName) {
 
     const props = layer.feature.properties;
 
-    // 🔍 debug ดูโครงสร้างจริง
-    console.log(props);
+    // 🔍 debug (ดูครั้งเดียวพอ)
+    // console.log(props);
 
-    // ✅ ใช้ key ให้ตรงกับ geojson ไทย
-    const geoName =
-      props.NL_NAME_2 ||   // อำเภอ (ไทย) ← ตัวหลัก
+    // 🧹 ทำความสะอาดชื่อจาก geojson ด้วย (จุดสำคัญ)
+    const geoName = (
+      props.NL_NAME_2 ||   // อำเภอ (ไทย)
       props.NAME_2 ||      // อำเภอ (อังกฤษ)
-      "";
+      ""
+    )
+      .replace("อำเภอ", "")
+      .replace("เขต", "")
+      .trim();
 
     // reset style ทุกอำเภอ
     layer.setStyle({
@@ -947,8 +937,8 @@ function highlightDistrict(districtName) {
       fillOpacity: 0.05
     });
 
-    // ถ้าชื่อตรง → highlight
-    if (geoName.trim() === inputName) {
+    // 🎯 match แล้ว highlight
+    if (geoName === inputName) {
       layer.setStyle({
         color: "#ff6600",
         weight: 3,
