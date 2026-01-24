@@ -685,6 +685,19 @@ function openTransportPopup() {
 </script>
 
 <script>
+function closeTransportPopup() {
+  popup.style.display = "none";
+
+  // เคลียร์ state
+  areas = [];
+  document.getElementById("areaList").innerHTML = "";
+
+  // 🔥 เคลียร์ไฮไลท์อำเภอทั้งหมด
+  clearHighlightDistricts();
+}
+</script>
+
+<script>
 function bindSearch(inputId, listId, items, onSelect) {
   const input = document.getElementById(inputId);
   const list = document.getElementById(listId);
