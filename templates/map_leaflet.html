@@ -903,41 +903,40 @@ function showDriverPopup(latlng, district, drivers) {
 </script>
 
 <script>
+function normalizeDistrictName(name) {
+  if (!name) return "";
+  return name
+    .replace("อำเภอ", "")
+    .replace("เขต", "")
+    .replace("อ.", "")
+    .trim();
+}
+
 function highlightDistrict(districtName) {
   if (!districtLayer || !districtName) return;
 
-  // 🧹 ทำความสะอาดชื่อจาก input
-  const inputName = districtName
-    .replace("อำเภอ", "")
-    .replace("เขต", "")
-    .trim();
+  const inputName = normalizeDistrictName(districtName);
 
   districtLayer.eachLayer(layer => {
     if (!layer.feature || !layer.feature.properties) return;
 
     const props = layer.feature.properties;
 
-    // 🔍 debug (ดูครั้งเดียวพอ)
-    // console.log(props);
+    const geoNameRaw =
+      props.NL_NAME_2 ||   // ไทย
+      props.NAME_2 ||      // อังกฤษ
+      "";
 
-    // 🧹 ทำความสะอาดชื่อจาก geojson ด้วย (จุดสำคัญ)
-    const geoName = (
-      props.NL_NAME_2 ||   // อำเภอ (ไทย)
-      props.NAME_2 ||      // อำเภอ (อังกฤษ)
-      ""
-    )
-      .replace("อำเภอ", "")
-      .replace("เขต", "")
-      .trim();
+    const geoName = normalizeDistrictName(geoNameRaw);
 
-    // reset style ทุกอำเภอ
+    // reset ทุกอำเภอ
     layer.setStyle({
       color: "#999",
       weight: 1,
       fillOpacity: 0.05
     });
 
-    // 🎯 match แล้ว highlight
+    // ✅ เทียบชื่อที่ถูก normalize แล้ว
     if (geoName === inputName) {
       layer.setStyle({
         color: "#ff6600",
@@ -945,7 +944,7 @@ function highlightDistrict(districtName) {
         fillOpacity: 0.35
       });
 
-      // (option) zoom เข้าหาอำเภอ
+      // ถ้าจะ zoom
       // map.fitBounds(layer.getBounds(), { padding: [20, 20] });
     }
   });
