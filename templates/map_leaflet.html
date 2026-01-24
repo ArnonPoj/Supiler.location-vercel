@@ -666,39 +666,23 @@ document.addEventListener("DOMContentLoaded", () => {
 <script>
 function openTransportPopup() {
   popup.style.display = "block";
-  areas = []; // ✅ reset
+  areas = [];
+
+  const checked = document.querySelector(
+    'input[name="transportType"]:checked'
+  );
+
+  if (checked && checked.value === "person") {
+    formArea.innerHTML =
+      document.getElementById("personFormTemplate").innerHTML;
+
+    initAreaSearch(); // ⭐ สำคัญมาก
+  } else {
+    formArea.innerHTML =
+      '<p class="hint">กรุณาเลือกประเภทขนส่ง</p>';
+  }
 }
 
-function closeTransportPopup() {
-  popup.style.display = "none";
-  formArea.innerHTML = '<p class="hint">กรุณาเลือกประเภทขนส่ง</p>';
-}
-
-function bindSearch(inputId, listId, items, onSelect) {
-  const input = document.getElementById(inputId);
-  const list = document.getElementById(listId);
-
-  if (!input || !list) return; // 🔒 กันพัง
-  
-  input.oninput = () => {
-    const q = input.value.trim();
-    list.innerHTML = "";
-    if (!q) return;
-
-    items
-      .filter(i => i.includes(q))
-      .forEach(i => {
-        const div = document.createElement("div");
-        div.textContent = i;
-        div.onclick = () => {
-          input.value = i;
-          list.innerHTML = "";
-          onSelect(i);
-        };
-        list.appendChild(div);
-      });
-  };
-}
 
 function loadDrivers(latlng, province, district) {
   console.log("LOAD DRIVERS CALLED:", province, district);
