@@ -218,15 +218,10 @@ ul {
     <p class="hint">กรุณาเลือกประเภทขนส่ง</p>
   </div>
 
-  <div style="text-align:right;margin-top:8px">
-    <button onclick="closeTransportPopup()">ยกเลิก</button>
-  </div>
-</div>
-
-
-    <hr>
-  </div>
-</div>
+        <div style="text-align:right;margin-top:8px">
+        <button onclick="closeTransportPopup()">ยกเลิก</button>
+      </div>
+    </div>
 
 <div id="driverList"
      style="
@@ -892,8 +887,8 @@ fetch("/static/thailand_district.geojson")
 map.doubleClickZoom.disable();
 </script>
 
-// pop up คนขับ
 
+<!-- pop up คนขับ -->
 <script>
 function showDriverPopup(latlng, district, drivers) {
   let html = `<h4>🚚 รถในอำเภอ${district}</h4>`;
