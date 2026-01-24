@@ -792,8 +792,14 @@ function addArea() {
 
   document.getElementById("districtInput").value = "";
   document.getElementById("subdistrictInput").value = "";
-  highlightDistrict(d); // d = district
+
+  // ⭐ ไฮไลท์แบบสะสม
+  if (d) {
+    highlightedDistricts.add(normalizeDistrictName(d));
+    highlightDistricts();
+  }
 }
+
 
 async function saveTransport() {
   const type = document.querySelector(
