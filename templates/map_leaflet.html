@@ -434,7 +434,7 @@ document.getElementById('tempMarkerBtn').onclick = function() {
   // เลเยอร์ไฮไลท์เเมพ หลังจากสร้าง map เสร็จ
 let districtLayer;
 
-fetch("/static/geo/th_districts.geojson")
+fetch("/static/thailand_district.geojson")
   .then(res => res.json())
   .then(data => {
     districtLayer = L.geoJSON(data, {
