@@ -969,30 +969,7 @@ function clearHighlightDistricts() {
 
 // expose
 window.highlightDistricts = highlightDistricts;
-window.clearHighlightDistricts = clearHighlightDistricts;
 </script>
-
-
-// ⭐ ทำให้เรียกจากปุ่ม / console ได้
-window.highlightDistrict = highlightDistrict;
-</script>
-
-<script>
-function clearHighlightDistrict() {
-  if (!districtLayer) return;
-
-  districtLayer.eachLayer(layer => {
-    layer.setStyle({
-      color: "#999",
-      weight: 1,
-      fillOpacity: 0.05
-    });
-  });
-}
-
-window.clearHighlightDistrict = clearHighlightDistrict;
-</script>
-
 
 
 
