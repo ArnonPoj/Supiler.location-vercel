@@ -732,24 +732,42 @@ function bindSearch(inputId, listId, items, onSelect) {
 
 
 <script>
-function loadDrivers(latlng, province, district) {
-  const d = normalizeDistrict(district);
 
-  console.log("LOAD DRIVERS CALLED:", province, d);
+// ใช้เทียบกับ geojson / highlight
+function normalizeDistrictName(name) {
+  if (!name) return "";
+  return name
+    .replace("อำเภอ", "")
+    .replace("เขต", "")
+    .replace("อ.", "")
+    .trim();
+}
+
+// ใช้ส่งเข้า API / DB
+function normalizeDistrictForAPI(name) {
+  if (!name) return "";
+  name = name.trim();
+  if (!name.startsWith("อำเภอ") && !name.startsWith("เขต")) {
+    name = "อำเภอ" + name;
+  }
+  return name;
+}
+
+function loadDrivers(latlng, province, district) {
+  const d = normalizeDistrictForAPI(district);
 
   fetch(
     `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(d)}`
   )
     .then(r => r.json())
     .then(drivers => {
-      console.log("DRIVERS =", drivers);
       showDriverPopup(latlng, d, drivers);
     })
-    .catch(err => {
-      console.error(err);
+    .catch(() => {
       showDriverPopup(latlng, d, []);
     });
 }
+
 
 
 function initAreaSearch() {
@@ -965,19 +983,6 @@ let highlightedDistricts = new Set();
 
   
 <script>
-function normalizeDistrict(d) {
-  if (!d) return "";
-  d = d.trim();
-
-  // ถ้าไม่มีคำนำหน้า → เติม "อำเภอ"
-  if (!d.startsWith("อำเภอ") && !d.startsWith("เขต")) {
-    d = "อำเภอ" + d;
-  }
-
-  return d;
-}
-
-
 function highlightDistricts() {
   if (!districtLayer) return;
 
