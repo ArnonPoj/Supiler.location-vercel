@@ -733,19 +733,21 @@ function bindSearch(inputId, listId, items, onSelect) {
 
 <script>
 function loadDrivers(latlng, province, district) {
-  console.log("LOAD DRIVERS CALLED:", province, district);
+  const d = normalizeDistrict(district);
+
+  console.log("LOAD DRIVERS CALLED:", province, d);
 
   fetch(
-    `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(district)}`
+    `/api/transport/personal/by-area?province=${encodeURIComponent(province)}&district=${encodeURIComponent(d)}`
   )
     .then(r => r.json())
     .then(drivers => {
       console.log("DRIVERS =", drivers);
-      showDriverPopup(latlng, district, drivers);
+      showDriverPopup(latlng, d, drivers);
     })
     .catch(err => {
       console.error(err);
-      showDriverPopup(latlng, district, []);
+      showDriverPopup(latlng, d, []);
     });
 }
 
