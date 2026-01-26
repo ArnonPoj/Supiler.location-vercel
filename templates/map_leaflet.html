@@ -965,14 +965,18 @@ let highlightedDistricts = new Set();
 
   
 <script>
-function normalizeDistrictName(name) {
-  if (!name) return "";
-  return name
-    .replace("อำเภอ", "")
-    .replace("เขต", "")
-    .replace("อ.", "")
-    .trim();
+function normalizeDistrict(d) {
+  if (!d) return "";
+  d = d.trim();
+
+  // ถ้าไม่มีคำนำหน้า → เติม "อำเภอ"
+  if (!d.startsWith("อำเภอ") && !d.startsWith("เขต")) {
+    d = "อำเภอ" + d;
+  }
+
+  return d;
 }
+
 
 function highlightDistricts() {
   if (!districtLayer) return;
