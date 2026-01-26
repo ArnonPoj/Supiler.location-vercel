@@ -804,9 +804,10 @@ function addArea() {
 
   areas.push({
     province: normalizeProvinceName(p),
-    district: d || null,
+    district: d ? normalizeDistrictName(d) : null,
     subdistrict: s
   });
+
 
 
   const li = document.createElement("li");
@@ -911,9 +912,16 @@ fetch("/static/thailand_district.geojson")
 
         // 🔥 double click อำเภอ
         layer.on("dblclick", e => {
-          console.log("DOUBLE CLICK:", province, district);
+          const province = normalizeProvinceName(
+          feature.properties.NL_NAME_1
+          );
+
+          const district = normalizeDistrictName(
+          feature.properties.NL_NAME_2
+          );
+
           loadDrivers(e.latlng, province, district);
-        });
+          });
       }
     }).addTo(map);
   });
