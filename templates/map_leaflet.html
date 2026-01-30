@@ -490,7 +490,7 @@ document.addEventListener("click", function(event) {
       const res = await fetch("/decode_olc_temp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ olc })
+        body: JSON.stringify({ olc, province })
       });
 
       const data = await res.json();
