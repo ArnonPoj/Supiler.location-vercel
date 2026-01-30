@@ -284,7 +284,16 @@ def markers_api():
 def decode_olc_temp():
     data = request.json or {}
     olc_code_raw = (data.get("olc") or "").strip()
-    province = data.get("province", "").strip() or "Bangkok"
+    province = (data.get("province") or "").strip()
+
+    # ถ้า frontend ไม่ส่งจังหวัดมา → detect จากข้อความ OLC
+    if not province:
+        province = detect_province_from_text(olc_code_raw)
+
+    # fallback สุดท้ายจริง ๆ
+    if not province or province not in province_refs:
+        province = "Bangkok"
+
 
     if not olc_code_raw:
         return jsonify({"error": "กรุณาส่งค่า OLC"}), 400
