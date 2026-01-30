@@ -481,40 +481,46 @@ document.addEventListener("click", function(event) {
   }
 
   async function showTemporaryMarker(olc) {
-    if (!olc) {
-      showToast('กรุณากรอก OLC');
-      return;
-    }
-
-    try {
-      const res = await fetch("/decode_olc_temp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ olc, province })
-      });
-
-      const data = await res.json();
-      if (!res.ok) return showToast(data.error || "ถอดรหัส OLC ไม่สำเร็จ");
-
-      const { lat, lng } = data;
-
-      if (tempMarker) map.removeLayer(tempMarker);
-
-      tempMarker = L.marker([lat, lng], {
-        icon: L.icon({
-          iconUrl: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle.png",
-          iconSize: [12, 12],
-          iconAnchor: [6, 6]
-        })
-      }).addTo(map).bindPopup(`<b>หมุดชั่วคราว</b><br>OLC: ${olc}`).openPopup();
-
-      map.setView([lat, lng], 18);
-
-    } catch (err) {
-      console.error(err);
-      showToast("เกิดข้อผิดพลาดในการปักหมุดชั่วคราว");
-    }
+  if (!olc) {
+    showToast('กรุณากรอก OLC');
+    return;
   }
+
+  // ⭐ ต้องประกาศก่อนใช้
+  const province =
+    document.getElementById("provinceInput")?.value?.trim() || "";
+
+  try {
+    const res = await fetch("/decode_olc_temp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ olc, province })
+    });
+
+    const data = await res.json();
+    if (!res.ok) return showToast(data.error || "ถอดรหัส OLC ไม่สำเร็จ");
+
+    const { lat, lng } = data;
+
+    if (tempMarker) map.removeLayer(tempMarker);
+
+    tempMarker = L.marker([lat, lng], {
+      icon: L.icon({
+        iconUrl: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle.png",
+        iconSize: [12, 12],
+        iconAnchor: [6, 6]
+      })
+    }).addTo(map)
+      .bindPopup(`<b>หมุดชั่วคราว</b><br>OLC: ${olc}`)
+      .openPopup();
+
+    map.setView([lat, lng], 18);
+
+  } catch (err) {
+    console.error(err);
+    showToast("เกิดข้อผิดพลาดในการปักหมุดชั่วคราว");
+  }
+}
 
 function hidePopupForm() {
   document.getElementById('popupForm').style.display = 'none';
