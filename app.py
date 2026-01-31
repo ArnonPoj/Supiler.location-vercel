@@ -51,6 +51,30 @@ def get_marker_by_id(id):
     conn.close()
     return row
 
+def decode_olc_core(olc_code_raw, province=None):
+    if not olc_code_raw:
+        raise ValueError("OLC ว่าง")
+
+    m = re.search(
+        r'([23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{2,3})',
+        olc_code_raw.upper()
+    )
+    olc_code = m.group(1) if m else olc_code_raw.split()[0]
+
+    if province and province in province_refs:
+        ref_lat, ref_lng = province_refs[province]
+    else:
+        ref_lat, ref_lng = province_refs["Bangkok"]
+
+    if not olc.isFull(olc_code):
+        recovered = olc.recoverNearest(olc_code, ref_lat, ref_lng)
+        decoded = olc.decode(recovered)
+    else:
+        decoded = olc.decode(olc_code)
+
+    return decoded.latitudeCenter, decoded.longitudeCenter
+
+
 def add_marker(lat, lon, title, olc_code=None, address=None, detail=None, tag=None):  # เพิ่ม tag
     conn = get_conn()
     c = conn.cursor()
@@ -250,21 +274,6 @@ def detect_province_from_text(text):
             return p
     return None
 
-def decode_olc(code, province=None):
-    plus_code = code.strip()
-    ref_lat, ref_lon = 15.0, 100.0
-
-    if province and province in province_refs:
-        ref_lat, ref_lon = province_refs[province]
-
-    if not olc.isFull(plus_code):
-        recovered = olc.recoverNearest(plus_code, ref_lat, ref_lon)
-        decoded = olc.decode(recovered)
-    else:
-        decoded = olc.decode(plus_code)
-
-    return decoded.latitudeCenter, decoded.longitudeCenter
-
 @app.route('/')
 def index():
     return render_template('map_leaflet.html')
@@ -286,49 +295,28 @@ def decode_olc_temp():
     olc_code_raw = (data.get("olc") or "").strip()
     province = (data.get("province") or "").strip()
 
-    # ถ้า frontend ไม่ส่งจังหวัดมา → detect จากข้อความ OLC
-    if not province:
-        province = detect_province_from_text(olc_code_raw)
-
-    # fallback สุดท้ายจริง ๆ
-    if not province or province not in province_refs:
-        province = "Bangkok"
-
-
     if not olc_code_raw:
         return jsonify({"error": "กรุณาส่งค่า OLC"}), 400
 
+    # ถ้า frontend ไม่ส่งจังหวัด → detect จากข้อความ
+    if not province:
+        province = detect_province_from_text(olc_code_raw)
+
+    # fallback สุดท้าย
+    if not province or province not in province_refs:
+        province = "Bangkok"
+
     try:
-        # ดึงเฉพาะ Plus Code ตัวแรกจากข้อความ (รองรับข้อความต่อท้าย เช่น "JGWG+3F Lat Luang,...")
-        m = re.search(r'([23456789CFGHJMPQRVWX]{4,8}\+[23456789CFGHJMPQRVWX]{2,3})', olc_code_raw.upper())
-        if m:
-            olc_code = m.group(1)
-        else:
-            # fallback: ใช้คำแรก
-            olc_code = olc_code_raw.split()[0]
-
-        # เลือก reference point (province_refs เก็บเป็น tuple (lat, lon))
-        if province in province_refs:
-            ref_lat, ref_lng = province_refs[province]
-        else:
-            # ถ้าไม่รู้จังหวัด ให้ใช้ Bangkok เป็น default
-            ref_lat, ref_lng = province_refs.get("Bangkok", (13.7563, 100.5018))
-
-        # ถ้า short code ให้ recoverNearest ก่อน
-        if not olc.isFull(olc_code):
-            recovered = olc.recoverNearest(olc_code, ref_lat, ref_lng)
-            decoded = olc.decode(recovered)
-        else:
-            decoded = olc.decode(olc_code)
+        lat, lng = decode_olc_core(olc_code_raw, province)
 
         return jsonify({
-            "lat": decoded.latitudeCenter,
-            "lng": decoded.longitudeCenter
+            "lat": lat,
+            "lng": lng,
+            "province": province   # (option) ส่งกลับไว้ debug
         }), 200
 
     except Exception as e:
         return jsonify({"error": f"ไม่สามารถถอดรหัส OLC: {str(e)}"}), 400
-
 
 @app.route('/add_marker', methods=['POST'])
 def add_marker_api():
@@ -357,7 +345,7 @@ def add_marker_api():
             return {"error": "พิกัดไม่ถูกต้อง"}, 400
     elif olc_code:
         try:
-            lat, lon = decode_olc(olc_code, province)
+            lat, lng = decode_olc_core(olc, province)
         except Exception as e:
             return {"error": f"OLC ไม่ถูกต้อง: {str(e)}"}, 400
     else:
@@ -384,7 +372,7 @@ def edit_marker_api(id):
 
     try:
         if olc_code:
-            lat, lon = decode_olc(olc_code, province)
+            lat, lng = decode_olc_core(olc, province)
         else:
             m = get_marker_by_id(id)
             if not m:
