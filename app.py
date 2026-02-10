@@ -299,13 +299,8 @@ def decode_olc_temp():
     if not olc_code_raw:
         return jsonify({"error": "กรุณาส่งค่า OLC"}), 400
 
-    # ถ้า frontend ไม่ส่งจังหวัด → detect จากข้อความ
     if not province:
         province = detect_province_from_text(olc_code_raw)
-
-    # fallback สุดท้าย
-    if not province or province not in province_refs:
-        province = "Bangkok"
 
     try:
         lat, lng = decode_olc_core(olc_code_raw, province)
@@ -313,11 +308,15 @@ def decode_olc_temp():
         return jsonify({
             "lat": lat,
             "lng": lng,
-            "province": province   # (option) ส่งกลับไว้ debug
+            "province": province
         }), 200
 
     except Exception as e:
-        return jsonify({"error": f"ไม่สามารถถอดรหัส OLC: {str(e)}"}), 400
+        return jsonify({
+            "error": f"ไม่สามารถถอดรหัส OLC ได้: {str(e)}",
+            "province_used": province
+        }), 400
+
 
 @app.route('/add_marker', methods=['POST'])
 def add_marker_api():
