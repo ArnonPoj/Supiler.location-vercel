@@ -345,7 +345,7 @@ def add_marker_api():
             return {"error": "พิกัดไม่ถูกต้อง"}, 400
     elif olc_code:
         try:
-            lat, lng = decode_olc_core(olc_code, province)
+            lat, lng = decode_olc_core(olc_code_raw, province)
         except Exception as e:
             return {"error": f"OLC ไม่ถูกต้อง: {str(e)}"}, 400
     else:
@@ -372,7 +372,7 @@ def edit_marker_api(id):
 
     try:
         if olc_code:
-            lat, lng = decode_olc_core(olc_code, province)
+            lat, lng = decode_olc_core(olc_code_raw, province)
         else:
             m = get_marker_by_id(id)
             if not m:
