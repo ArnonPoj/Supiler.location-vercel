@@ -62,12 +62,12 @@ def decode_olc_core(olc_code_raw, province=None):
     olc_code = m.group(1) if m else olc_code_raw.split()[0]
 
     if province and province in province_refs:
-        ref_lat, ref_lng = province_refs[province]
+        ref_lat, ref_lon = province_refs[province]
     else:
-        ref_lat, ref_lng = province_refs["Bangkok"]
+        ref_lat, ref_lon = province_refs["Bangkok"]
 
     if not olc.isFull(olc_code):
-        recovered = olc.recoverNearest(olc_code, ref_lat, ref_lng)
+        recovered = olc.recoverNearest(olc_code, ref_lat, ref_lon)
         decoded = olc.decode(recovered)
     else:
         decoded = olc.decode(olc_code)
@@ -307,7 +307,7 @@ def decode_olc_temp():
 
         return jsonify({
             "lat": lat,
-            "lng": lng,
+            "lon": lon,
             "province": province
         }), 200
 
