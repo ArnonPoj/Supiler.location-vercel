@@ -959,7 +959,7 @@ function showDriverPopup(latlon, district, drivers) {
   }
 
   L.popup({ maxWidth: 300 })
-    .setLatlon(latlon)
+    .setLatlng(latlon)
     .setContent(html)
     .openOn(map);
 }
