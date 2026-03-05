@@ -500,11 +500,11 @@ document.addEventListener("click", function(event) {
     const data = await res.json();
     if (!res.ok) return showToast(data.error || "ถอดรหัส OLC ไม่สำเร็จ");
 
-    const { lat, lng } = data;
+    const { lat, lon } = data;
 
     if (tempMarker) map.removeLayer(tempMarker);
 
-    tempMarker = L.marker([lat, lng], {
+    tempMarker = L.marker([lat, lon], {
       icon: L.icon({
         iconUrl: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle.png",
         iconSize: [12, 12],
@@ -514,7 +514,7 @@ document.addEventListener("click", function(event) {
       .bindPopup(`<b>หมุดชั่วคราว</b><br>OLC: ${olc}`)
       .openPopup();
 
-    map.setView([lat, lng], 18);
+    map.setView([lat, lon], 18);
 
   } catch (err) {
     console.error(err);
@@ -740,7 +740,7 @@ function bindSearch(inputId, listId, items, onSelect) {
 
 
 <script>
-function loadDrivers(latlng, province, district) {
+function loadDrivers(latlon, province, district) {
   console.log("LOAD DRIVERS CALLED:", province, district);
 
   fetch(
@@ -749,11 +749,11 @@ function loadDrivers(latlng, province, district) {
     .then(r => r.json())
     .then(drivers => {
       console.log("DRIVERS =", drivers);
-      showDriverPopup(latlng, district, drivers);
+      showDriverPopup(latlon, district, drivers);
     })
     .catch(err => {
       console.error(err);
-      showDriverPopup(latlng, district, []);
+      showDriverPopup(latlon, district, []);
     });
 }
 
@@ -928,7 +928,7 @@ fetch("/static/thailand_district.geojson")
           feature.properties.NL_NAME_2
           );
 
-          loadDrivers(e.latlng, province, district);
+          loadDrivers(e.latlon, province, district);
           });
       }
     }).addTo(map);
@@ -941,7 +941,7 @@ map.doubleClickZoom.disable();
 
 <!-- pop up คนขับ -->
 <script>
-function showDriverPopup(latlng, district, drivers) {
+function showDriverPopup(latlon, district, drivers) {
   let html = `<h4>🚚 รถในอำเภอ${district}</h4>`;
 
   if (!drivers || drivers.length === 0) {
@@ -959,7 +959,7 @@ function showDriverPopup(latlng, district, drivers) {
   }
 
   L.popup({ maxWidth: 300 })
-    .setLatLng(latlng)
+    .setLatlon(latlon)
     .setContent(html)
     .openOn(map);
 }
