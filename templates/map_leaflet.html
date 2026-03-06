@@ -235,6 +235,7 @@ ul {
   <p>คลิกอำเภอบนแผนที่</p>
 </div>
 
+<button onclick="openCreateJob()">📦 สร้างงาน</button>
 
 <button id="importBtn" onclick="document.getElementById('importInput').click()">📥 Import CSV</button>
 <input type="file" id="importInput" accept=".csv" style="display:none;" />
@@ -1025,6 +1026,11 @@ function normalizeProvinceName(name) {
 }
 </script>
 
+<script>
+function openCreateJob(){
+    window.location.href = "/create_job"
+}
+</script>
 
 
 </body>
