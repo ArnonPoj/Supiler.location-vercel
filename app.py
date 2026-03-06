@@ -9,11 +9,13 @@ from io import StringIO
 import pandas as pd
 
 from routes.driver_routes import driver_bp
+from routes.job_routes import job_bp
 
 
 app = Flask(__name__)
 
 app.register_blueprint(driver_bp)
+app.register_blueprint(job_bp)
 
 DATABASE_URL = "postgresql://neondb_owner:npg_Rfi9yh6gpFTC@ep-delicate-flower-a1m8x768-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
