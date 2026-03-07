@@ -1,20 +1,34 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, redirect
+import uuid
 
 job_bp = Blueprint("job", __name__)
+
+jobs = {}
 
 @job_bp.route("/create_job", methods=["GET","POST"])
 def create_job():
 
+    # เปิดหน้า form
+    if request.method == "GET":
+        return render_template("create_job.html")
+
+    # กดสร้างงาน
     if request.method == "POST":
-        customer = request.form["customer"]
-        address = request.form["address"]
-        phone = request.form["phone"]
-        detail = request.form["detail"]
-        pluscode = request.form["pluscode"]
-        note = request.form["note"]
 
-        # save database
+        job_id = str(uuid.uuid4())[:8]
 
-        return "สร้างงานสำเร็จ"
+        jobs[job_id] = {
+            "customer": request.form.get("customer"),
+            "address": request.form.get("address"),
+            "phone": request.form.get("phone"),
+            "detail": request.form.get("detail"),
+            "pluscode": request.form.get("pluscode"),
+            "note": request.form.get("note")
+        }
 
-    return render_template("create_job.html")
+        link = f"/job/{job_id}"
+
+        print("Job created:", job_id)
+        print("Driver link:", link)
+
+        return f"สร้างงานสำเร็จ<br>ลิงค์ส่งคนขับ: {link}"
