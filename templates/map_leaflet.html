@@ -950,7 +950,7 @@ fetch("/static/thailand_district.geojson")
           feature.properties.NL_NAME_2
           );
 
-          loadDrivers(e.latlon, province, district);
+          loadDrivers(e.latlng, province, district);
           });
       }
     }).addTo(map);
@@ -981,7 +981,7 @@ function showDriverPopup(latlon, district, drivers) {
   }
 
   L.popup({ maxWidth: 300 })
-    .setLatlng(latlng)
+    .setLatLng(latlon)
     .setContent(html)
     .openOn(map);
 }
