@@ -208,6 +208,23 @@ ul {
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
 
+/* pop up ลงงานส่ง */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 20000;
+}
+
+.modal-content {
+  background: #fff;
+  width: 420px;
+  margin: 5vh auto;
+  padding: 16px;
+  border-radius: 10px;
+}
+
 </style>
 </head>
   
@@ -1048,7 +1065,7 @@ function normalizeProvinceName(name) {
 </script>
 
 <!-- ฟอร์มลงงานขนส่ง -->
-<div id="jobModal" class="popup">
+<div id="jobModal" class="modal">
   <div class="modal-content">
     <span class="close" onclick="closeJobPopup()">&times;</span>
 
