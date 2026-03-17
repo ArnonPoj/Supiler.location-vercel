@@ -1047,10 +1047,51 @@ function normalizeProvinceName(name) {
 }
 </script>
 
+<!-- ฟอร์มลงงานขนส่ง -->
+<div id="jobModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeJobPopup()">&times;</span>
+
+    <h2>สร้างงานจัดส่ง</h2>
+
+    <form method="POST" action="/create_job">
+      <label>ชื่อลูกค้า</label>
+      <input type="text" name="customer">
+
+      <label>เบอร์โทร</label>
+      <input type="text" name="phone">
+
+      <label>จุดรับสินค้า 1</label>
+      <input type="text" name="pickup1">
+
+      <label>จุดรับสินค้า 2</label>
+      <input type="text" name="pickup2">
+
+      <label>จุดส่งสินค้า</label>
+      <input type="text" name="dropoff">
+
+      <label>รายละเอียดสินค้า</label>
+      <textarea name="detail"></textarea>
+
+      <label>ค่าจัดส่ง</label>
+      <input type="number" name="price">
+
+      <button type="submit">สร้างงาน</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  
 <script>
 function openCreateJob(){
 document.getElementById("jobModal").style.display = "block";
 }
+
+function closeJobPopup(){
+  document.getElementById("jobModal").style.display = "none";
+}
+
 </script>
 
 
